@@ -18,6 +18,13 @@ export default defineConfig({
       provider: 'v8',
       // Coverage is a domain-layer gate only (see design §9). UI coverage is not a goal.
       include: ['src/domain/**'],
+      thresholds: {
+        // The domain ring is pure functions with no I/O, no framework and no
+        // unreachable error handling — an uncovered line there is a real gap,
+        // not a hard-to-test corner. Scoped by glob rather than set globally so
+        // widening `include` later cannot silently dilute this gate.
+        'src/domain/**': { lines: 100 },
+      },
     },
   },
 })
