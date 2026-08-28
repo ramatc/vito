@@ -14,20 +14,49 @@
           {
             "patterns": [
               {
+                "group": ["*", "**", "!./*", "!./**"],
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. This file sits deeper than src/domain/<dir>/<file>, a depth the boundary rule does not model, so only same-subtree imports are allowed. Flatten the file or add a matching depth override to .oxlintrc.json."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/domain/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*", "!./**", "!../types/*", "!../types/**"],
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. Everything else — third-party packages, node builtins, and every other src/ ring — is denied by default."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/domain/*/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
                 "group": [
-                  "react",
-                  "react-*",
-                  "zustand",
-                  "zustand/*",
-                  "framer-motion",
-                  "lucide-react",
-                  "**/services/**",
-                  "**/stores/**",
-                  "**/features/**",
-                  "**/components/**",
-                  "**/hooks/**"
+                  "*",
+                  "**",
+                  "!./*",
+                  "!./**",
+                  "!../*",
+                  "!../*/*",
+                  "!../../types/*",
+                  "!../../types/**"
                 ],
-                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**."
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. Everything else — third-party packages, node builtins, and every other src/ ring — is denied by default."
               }
             ]
           }
