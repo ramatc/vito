@@ -25,14 +25,27 @@ export type CosmeticSlot = 'hat' | 'backpack' | 'aura'
  */
 export type EquippedItems = Partial<Record<CosmeticSlot, string>>
 
-/** `days` uses JS weekday numbering: 0 = Sunday .. 6 = Saturday. */
-export type Frequency = { type: 'daily' } | { type: 'weekdays'; days: number[] }
+/** JS weekday numbering: 0 = Sunday .. 6 = Saturday. */
+export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6
+
+/**
+ * `days` is a non-empty tuple on purpose. A `weekdays` habit with no day
+ * selected is never due, which is not a state the product has — making it
+ * unrepresentable turns a runtime validation into a compile error.
+ */
+export type Frequency =
+  { type: 'daily' } | { type: 'weekdays'; days: [Weekday, ...Weekday[]] }
 
 export interface Habit {
   id: string
   name: string
-  /** `lucide-react` icon name. */
+  /** Key into the icon map in the UI layer, not an icon-library import name. */
   icon: string
+  /**
+   * Free-form user-supplied label. Deliberately not an enum: the MVP lets users
+   * invent their own groupings, and locking the set here would need a migration
+   * for every new category.
+   */
   category: string
   frequency: Frequency
   difficulty: Difficulty
