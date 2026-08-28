@@ -4,6 +4,8 @@ import { Screen } from '../components/layout/Screen'
 import { Card } from '../components/ui/Card'
 import { HabitsScreen } from '../features/habits/HabitsScreen'
 import { TodayHabits } from '../features/habits/TodayHabits'
+import { ProgressSection } from '../features/progress/ProgressSection'
+import { VitoStage } from '../features/vito/components/VitoStage'
 
 /**
  * The app's four surfaces, all nested inside `AppShell` so navigation is part of
@@ -11,12 +13,18 @@ import { TodayHabits } from '../features/habits/TodayHabits'
  */
 
 /**
- * Home. Phase 7 replaces this body with the Vito hero and the progress section
- * above the same `TodayHabits` block — the route itself does not change.
+ * Home: the companion, the numbers he grows on, and today's list.
+ *
+ * Composed here rather than in a `features/home/` screen because the
+ * composition spans three features and the route is the honest owner of that.
+ * Each block subscribes to its own slice, so completing a habit updates the
+ * avatar, the bars and the list from one store write.
  */
 function HomeRoute() {
   return (
     <Screen title="Today" description="One at a time. Vito grows with every one.">
+      <VitoStage />
+      <ProgressSection />
       <TodayHabits />
     </Screen>
   )
