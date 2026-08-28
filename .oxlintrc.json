@@ -132,10 +132,12 @@
                   "!./*",
                   "!../types/*",
                   "!../domain/*/*",
-                  "!../services/storage/*",
+                  "!../services/storage/repositories",
+                  "!../services/storage/defaults",
+                  "!../utils/*",
                   "!zustand"
                 ],
-                "message": "stores/ orchestrates: it may import src/types/**, src/domain/**, the services/storage public surface, its sibling stores and zustand. No React, no features/, no components/ — a store that needs those is holding UI concerns."
+                "message": "stores/ orchestrates: it may import src/types/**, src/domain/**, src/utils/**, the services/storage public surface, its sibling stores and zustand. No React, no features/, no components/ — a store that needs those is holding UI concerns."
               }
             ]
           }
@@ -156,11 +158,14 @@
                   "!./*",
                   "!../types/*",
                   "!../domain/*/*",
-                  "!../services/storage/*",
+                  "!../services/storage/repositories",
+                  "!../services/storage/defaults",
+                  "!../test/*",
+                  "!../utils/*",
                   "!zustand",
                   "!vitest"
                 ],
-                "message": "A store test may import exactly what the store under test may import, plus the bare `vitest` specifier."
+                "message": "A store test may import exactly what the store under test may import, plus the bare `vitest` specifier and the shared fakes in src/test/."
               }
             ]
           }

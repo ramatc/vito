@@ -17,6 +17,8 @@ function readAll(): HabitCompletion[] {
 
 export function createLocalCompletionRepository(): CompletionRepository {
   return {
+    listAll: async () => readAll(),
+
     listByDate: async (date) =>
       readAll().filter((completion) => completion.date === date),
 

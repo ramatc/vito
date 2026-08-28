@@ -29,6 +29,13 @@ export interface HabitRepository {
 }
 
 export interface CompletionRepository {
+  /**
+   * The whole log. The MVP holds every completion in memory (design §11) —
+   * thousands of rows at realistic volume. Named explicitly rather than
+   * expressed as an unbounded `listRange`, so a future backend implements the
+   * intent instead of interpreting sentinel dates.
+   */
+  listAll(): Promise<HabitCompletion[]>
   listByDate(date: DateKey): Promise<HabitCompletion[]>
   /** Both endpoints included. */
   listRange(from: DateKey, to: DateKey): Promise<HabitCompletion[]>
