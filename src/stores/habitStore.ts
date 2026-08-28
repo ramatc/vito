@@ -63,6 +63,18 @@ export interface HabitStore {
   reset(): Promise<void>
 }
 
+/**
+ * Habit ids with a `completeHabit` call currently in flight.
+ *
+ * Module scope rather than store state: this is a synchronous re-entrancy
+ * guard, not something a component ever renders from, and giving it its own
+ * `set` would trigger a re-render for no observer. Two overlapping calls for
+ * the same habit (a rapid double-tap) both read `alreadyDone` as false before
+ * either await settles, so the `completions` check alone cannot stop a double
+ * award — this closes that window.
+ */
+const inFlightCompletions = new Set<string>()
+
 export const useHabitStore = create<HabitStore>()((set, get) => ({
   habits: [],
   completions: [],
@@ -110,75 +122,88 @@ export const useHabitStore = create<HabitStore>()((set, get) => ({
   },
 
   completeHabit: async (habitId, today) => {
-    const { habits, completions } = get()
-    const habit = habits.find((candidate) => candidate.id === habitId)
-
-    if (habit === undefined || !isScheduledOn(habit, today)) {
+    // Checked and set synchronously, before any `await`: this is what makes it
+    // a real guard against two overlapping calls rather than another read of
+    // state that both callers could pass at once.
+    if (inFlightCompletions.has(habitId)) {
       return null
     }
 
-    const alreadyDone = completions.some(
-      (completion) => completion.habitId === habitId && completion.date === today,
-    )
+    inFlightCompletions.add(habitId)
 
-    if (alreadyDone) {
-      return null
-    }
+    try {
+      const { habits, completions } = get()
+      const habit = habits.find((candidate) => candidate.id === habitId)
 
-    const progressStore = useProgressStore.getState()
-    const lastActivityDate = progressStore.progress.lastActivityDate
+      if (habit === undefined || !isScheduledOn(habit, today)) {
+        return null
+      }
 
-    // Only this store knows what was scheduled, so it is the one that can tell
-    // the progression layer how many scheduled days were fully missed since the
-    // last activity. Rest days are excluded by the domain function, which is
-    // what keeps them neutral for streaks.
-    const missedScheduledDays =
-      lastActivityDate === null
-        ? 0
-        : countMissedScheduledDays({
-            habits,
-            completions,
-            from: lastActivityDate,
-            to: today,
-          })
+      const alreadyDone = completions.some(
+        (completion) => completion.habitId === habitId && completion.date === today,
+      )
 
-    const delta = await progressStore.registerCompletion({
-      baseXp: xpRewardFor(habit.difficulty),
-      today,
-      missedScheduledDays,
-    })
+      if (alreadyDone) {
+        return null
+      }
 
-    // The snapshot is the XP actually awarded, boost included. History is
-    // immutable: retuning difficulty later must never rewrite this number.
-    const completion: HabitCompletion = {
-      id: newId(),
-      habitId,
-      date: today,
-      xpAwarded: delta.xpGained,
-      completedAt: new Date().toISOString(),
-    }
+      const progressStore = useProgressStore.getState()
+      const lastActivityDate = progressStore.progress.lastActivityDate
 
-    await getRepositories().completions.add(completion)
-    set({ completions: [...get().completions, completion] })
+      // Only this store knows what was scheduled, so it is the one that can tell
+      // the progression layer how many scheduled days were fully missed since the
+      // last activity. Rest days are excluded by the domain function, which is
+      // what keeps them neutral for streaks.
+      const missedScheduledDays =
+        lastActivityDate === null
+          ? 0
+          : countMissedScheduledDays({
+              habits,
+              completions,
+              from: lastActivityDate,
+              to: today,
+            })
 
-    const unlockedItemIds = await useVitoStore.getState().syncUnlocks({
-      level: delta.newLevel,
-      totalXp: useProgressStore.getState().progress.totalXp,
-      longestStreak: useProgressStore.getState().progress.longestStreak,
-    })
+      const delta = await progressStore.registerCompletion({
+        baseXp: xpRewardFor(habit.difficulty),
+        today,
+        missedScheduledDays,
+      })
 
-    const previousStage = getEvolutionStage(delta.previousLevel)
-    const newStage = getEvolutionStage(delta.newLevel)
+      // The snapshot is the XP actually awarded, boost included. History is
+      // immutable: retuning difficulty later must never rewrite this number.
+      const completion: HabitCompletion = {
+        id: newId(),
+        habitId,
+        date: today,
+        xpAwarded: delta.xpGained,
+        completedAt: new Date().toISOString(),
+      }
 
-    return {
-      xpGained: delta.xpGained,
-      boosted: delta.boosted,
-      momentumDelta: delta.momentumDelta,
-      leveledUp: delta.leveledUp,
-      newLevel: delta.newLevel,
-      stageChanged: newStage !== previousStage,
-      newStage,
-      unlockedItemIds,
+      await getRepositories().completions.add(completion)
+      set({ completions: [...get().completions, completion] })
+
+      const unlockedItemIds = await useVitoStore.getState().syncUnlocks({
+        level: delta.newLevel,
+        totalXp: useProgressStore.getState().progress.totalXp,
+        longestStreak: useProgressStore.getState().progress.longestStreak,
+      })
+
+      const previousStage = getEvolutionStage(delta.previousLevel)
+      const newStage = getEvolutionStage(delta.newLevel)
+
+      return {
+        xpGained: delta.xpGained,
+        boosted: delta.boosted,
+        momentumDelta: delta.momentumDelta,
+        leveledUp: delta.leveledUp,
+        newLevel: delta.newLevel,
+        stageChanged: newStage !== previousStage,
+        newStage,
+        unlockedItemIds,
+      }
+    } finally {
+      inFlightCompletions.delete(habitId)
     }
   },
 

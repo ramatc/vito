@@ -5,3 +5,6 @@ package-lock.json
 
 # Tooling artifact mirrored from Engram — keep byte-stable.
 .atl
+
+# Local editor-tooling cache, git-excluded but still on disk for the formatter.
+.impeccable
