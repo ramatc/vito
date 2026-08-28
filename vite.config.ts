@@ -9,6 +9,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/test/setup.ts',
+    // A committed `.only` must fail the run, not silently skip the rest of the
+    // suite. Vitest defaults this to `!process.env.CI`, which makes the result
+    // depend on an env var nobody sets locally — pinned here so local and CI
+    // behave identically.
+    allowOnly: false,
     coverage: {
       provider: 'v8',
       // Coverage is a domain-layer gate only (see design §9). UI coverage is not a goal.
