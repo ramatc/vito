@@ -2,6 +2,7 @@ import type { FormEvent } from 'react'
 import { useId, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { IconPicker } from '../../components/ui/IconPicker'
+import { XP_BY_DIFFICULTY } from '../../domain/habit/xpReward'
 import type { Difficulty, Frequency, Habit, Weekday } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { DEFAULT_CATEGORY, SUGGESTED_CATEGORIES } from './categories'
@@ -31,10 +32,12 @@ export interface HabitFormProps {
   submitLabel?: string
 }
 
+// XP derived from the single source of truth rather than inlined: XP_BY_DIFFICULTY's
+// own comment says no call site may hardcode these numbers.
 const DIFFICULTIES: readonly { value: Difficulty; label: string; xp: string }[] = [
-  { value: 'easy', label: 'Easy', xp: '10 XP' },
-  { value: 'normal', label: 'Normal', xp: '20 XP' },
-  { value: 'hard', label: 'Hard', xp: '30 XP' },
+  { value: 'easy', label: 'Easy', xp: `${String(XP_BY_DIFFICULTY.easy)} XP` },
+  { value: 'normal', label: 'Normal', xp: `${String(XP_BY_DIFFICULTY.normal)} XP` },
+  { value: 'hard', label: 'Hard', xp: `${String(XP_BY_DIFFICULTY.hard)} XP` },
 ]
 
 export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormProps) {

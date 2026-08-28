@@ -153,6 +153,22 @@ describe('completeHabit — completing twice in one day', () => {
   })
 })
 
+describe('completeHabit — overlapping calls for the same habit', () => {
+  // A rapid double-tap fires both calls before either has awaited anything,
+  // so both would read `alreadyDone` as false without the in-flight guard —
+  // this is the race the store-level guard in `completeHabit` closes.
+  it('awards XP only once when two calls race before either settles', async () => {
+    const fake = await boot()
+
+    const [first, second] = await Promise.all([complete(), complete()])
+
+    const outcomes = [first, second]
+    expect(outcomes.filter((outcome) => outcome !== null)).toHaveLength(1)
+    expect(fake.data.completions).toHaveLength(1)
+    expect(progressNow().totalXp).toBe(NORMAL_XP)
+  })
+})
+
 describe('completeHabit — when the habit is not completable', () => {
   it('returns null for a habit that is not scheduled today', async () => {
     // 2026-03-10 is a Tuesday (weekday 2); this habit is Monday-only.

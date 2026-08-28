@@ -1,6 +1,7 @@
 import { createElement } from 'react'
 import { Archive, Check, Pencil } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
+import { XP_BY_DIFFICULTY } from '../../domain/habit/xpReward'
 import type { Habit } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { describeFrequency } from './frequency'
@@ -11,10 +12,12 @@ import { resolveHabitIcon } from './habitIcons'
  * stores, XP or what completing actually does.
  */
 
+// Derived from the single source of truth rather than inlined: XP_BY_DIFFICULTY's
+// own comment says no call site may hardcode these numbers.
 const XP_HINT: Record<Habit['difficulty'], string> = {
-  easy: '10 XP',
-  normal: '20 XP',
-  hard: '30 XP',
+  easy: `${String(XP_BY_DIFFICULTY.easy)} XP`,
+  normal: `${String(XP_BY_DIFFICULTY.normal)} XP`,
+  hard: `${String(XP_BY_DIFFICULTY.hard)} XP`,
 }
 
 export interface HabitCardProps {

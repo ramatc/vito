@@ -4,9 +4,10 @@ import { Screen } from '../../components/layout/Screen'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
-import { useCompleteHabit } from '../../hooks/useCompleteHabit'
+import { SAVE_ERROR_MESSAGE, useCompleteHabit } from '../../hooks/useCompleteHabit'
 import { useTodayHabits } from '../../hooks/useTodayHabits'
 import { useHabitStore } from '../../stores/habitStore'
+import { useUiStore } from '../../stores/uiStore'
 import type { Habit } from '../../types/models'
 import type { HabitDraftValues } from './HabitForm'
 import { HabitFormModal } from './HabitFormModal'
@@ -22,7 +23,7 @@ import { HabitList } from './HabitList'
 export function HabitsScreen() {
   const habits = useHabitStore((state) => state.habits)
   const { completedHabitIds, today } = useTodayHabits()
-  const { complete, undo } = useCompleteHabit(today)
+  const { toggle, pendingHabitIds } = useCompleteHabit(today)
 
   const [editing, setEditing] = useState<Habit | undefined>(undefined)
   const [formOpen, setFormOpen] = useState(false)
@@ -45,35 +46,34 @@ export function HabitsScreen() {
     setEditing(undefined)
   }
 
+  const reportSaveError = () => {
+    useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+  }
+
   const submitForm = (values: HabitDraftValues) => {
     const store = useHabitStore.getState()
 
-    if (editing === undefined) {
-      void store.createHabit(values)
-    } else {
-      // Forward-only: past completions keep the XP they were awarded.
-      void store.updateHabit(editing.id, values)
-    }
+    const result =
+      editing === undefined
+        ? store.createHabit(values)
+        : // Forward-only: past completions keep the XP they were awarded.
+          store.updateHabit(editing.id, values)
+
+    result.catch(reportSaveError)
 
     closeForm()
   }
 
   const confirmArchive = () => {
     if (archiving !== undefined) {
-      void useHabitStore.getState().archiveHabit(archiving.id)
+      useHabitStore.getState().archiveHabit(archiving.id).catch(reportSaveError)
     }
 
     setArchiving(undefined)
   }
 
   const onToggle = (habitId: string) => {
-    if (completedHabitIds.includes(habitId)) {
-      void undo(habitId)
-
-      return
-    }
-
-    void complete(habitId)
+    toggle(habitId, completedHabitIds.includes(habitId))
   }
 
   return (
@@ -91,6 +91,7 @@ export function HabitsScreen() {
         habits={activeHabits}
         completedHabitIds={completedHabitIds}
         onToggle={onToggle}
+        busyHabitIds={pendingHabitIds}
         onEdit={openEdit}
         onArchive={setArchiving}
         empty={

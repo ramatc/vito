@@ -14,16 +14,10 @@ import { HabitList } from './HabitList'
 export function TodayHabits() {
   const { habits, completedHabitIds, completedCount, scheduledCount, allDone, restDay } =
     useTodayHabits()
-  const { complete, undo } = useCompleteHabit()
+  const { toggle, pendingHabitIds } = useCompleteHabit()
 
   const onToggle = (habitId: string) => {
-    if (completedHabitIds.includes(habitId)) {
-      void undo(habitId)
-
-      return
-    }
-
-    void complete(habitId)
+    toggle(habitId, completedHabitIds.includes(habitId))
   }
 
   return (
@@ -44,6 +38,7 @@ export function TodayHabits() {
         habits={habits}
         completedHabitIds={completedHabitIds}
         onToggle={onToggle}
+        busyHabitIds={pendingHabitIds}
         empty={
           <Card className="flex flex-col items-start gap-2 text-sm text-slate-600">
             {restDay ? (
