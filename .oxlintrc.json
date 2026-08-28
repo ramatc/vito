@@ -1,0 +1,83 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "import", "vitest"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "overrides": [
+    {
+      "files": ["src/domain/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*", "!./**"],
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. This file sits deeper than src/domain/<dir>/<file>, a depth the boundary rule does not model, so only same-subtree imports are allowed. Flatten the file or add a matching depth override to .oxlintrc.json."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/domain/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*", "!./**", "!../types/*", "!../types/**"],
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. Everything else — third-party packages, node builtins, and every other src/ ring — is denied by default."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/domain/*/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!./**",
+                  "!../*",
+                  "!../*/*",
+                  "!../../types/*",
+                  "!../../types/**"
+                ],
+                "message": "domain/ is a pure ring: it may import only src/domain/** and src/types/**. Everything else — third-party packages, node builtins, and every other src/ ring — is denied by default."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/types/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**"],
+                "message": "types/ is the leaf ring: it must import nothing."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
