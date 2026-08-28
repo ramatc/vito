@@ -173,6 +173,197 @@
       }
     },
     {
+      "files": ["src/hooks/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../stores/*",
+                  "!../utils/*",
+                  "!react"
+                ],
+                "message": "hooks/ is the derivation ring: it may import React, src/stores/**, src/domain/**, src/types/** and src/utils/**. No components/ or features/ — a hook that renders is a component."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/components/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*"],
+                "message": "components/ is the presentational ring. This file sits deeper than src/components/<dir>/<file>, a depth the boundary rule does not model, so only same-directory imports are allowed. Flatten the file or add a matching depth override to .oxlintrc.json."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/components/*/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../*/*",
+                  "!../../types/*",
+                  "!../../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-dom",
+                  "!react-dom/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!lucide-react"
+                ],
+                "message": "components/ is presentational: it may import React, the router, motion and icon libraries, sibling components, src/types/** and src/utils/**. No stores/, no hooks/, no features/, no domain/ — a component that needs those is a feature container, and the data belongs in its props."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/features/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*"],
+                "message": "features/ is the UI composition ring. This file sits deeper than src/features/<feature>/<file>, a depth the boundary rule does not model, so only same-directory imports are allowed. Flatten the file or add a matching depth override to .oxlintrc.json."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/features/*/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../*/*",
+                  "!../../components/*/*",
+                  "!../../hooks/*",
+                  "!../../stores/*",
+                  "!../../domain/*/*",
+                  "!../../types/*",
+                  "!../../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!lucide-react"
+                ],
+                "message": "features/ composes the UI: it may import React, the router, motion and icon libraries, components/, hooks/, stores/, domain/, types/ and utils/. No services/storage — persistence is reached through a store, never directly."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../stores/*",
+                  "!../services/storage/repositories",
+                  "!../hooks/*",
+                  "!../components/*/*",
+                  "!../features/*/*",
+                  "!../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-dom",
+                  "!react-dom/*",
+                  "!react-router-dom",
+                  "!framer-motion"
+                ],
+                "message": "app/ is the composition root and the only ring allowed to see everything below it. Even here the private localStorageClient stays out of reach: storage is reached through services/storage/repositories."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/app/*.test.ts", "src/app/*.test.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../stores/*",
+                  "!../services/storage/repositories",
+                  "!../hooks/*",
+                  "!../components/*/*",
+                  "!../features/*/*",
+                  "!../test/*",
+                  "!../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-dom",
+                  "!react-dom/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!vitest",
+                  "!@testing-library/react",
+                  "!@testing-library/user-event"
+                ],
+                "message": "An app test may import exactly what the module under test may import, plus the test runner, Testing Library and the shared fakes in src/test/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/domain/*/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
