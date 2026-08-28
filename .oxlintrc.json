@@ -80,6 +80,99 @@
       }
     },
     {
+      "files": ["src/services/storage/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*", "!../../types/*", "!../../domain/*/*"],
+                "message": "services/storage/ sits below stores/ and features/: it may import only src/types/**, src/domain/** and its own siblings. Importing upward would invert the dependency and make persistence untestable without the UI. Report problems through setStorageErrorHandler instead."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/services/storage/*.test.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../../types/*",
+                  "!../../domain/*/*",
+                  "!vitest"
+                ],
+                "message": "A storage test may import exactly what the modules under test may import, plus the bare `vitest` specifier."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/stores/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../services/storage/repositories",
+                  "!../services/storage/defaults",
+                  "!../utils/*",
+                  "!zustand"
+                ],
+                "message": "stores/ orchestrates: it may import src/types/**, src/domain/**, src/utils/**, the services/storage public surface, its sibling stores and zustand. No React, no features/, no components/ — a store that needs those is holding UI concerns."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/stores/*.test.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../services/storage/repositories",
+                  "!../services/storage/defaults",
+                  "!../test/*",
+                  "!../utils/*",
+                  "!zustand",
+                  "!vitest"
+                ],
+                "message": "A store test may import exactly what the store under test may import, plus the bare `vitest` specifier and the shared fakes in src/test/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/domain/*/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
