@@ -52,6 +52,17 @@ export function applyCompletionCredit(input: {
 }
 
 /**
+ * Credits the one-off recovery that comes with triggering a comeback.
+ *
+ * Returns a bare number rather than a `MomentumResult` because a comeback
+ * neither consumes nor resets the daily credit allowance — reporting a
+ * `creditedToday` here would be inventing a value the caller must not trust.
+ */
+export function applyComebackRecovery(momentum: number): number {
+  return clamp(momentum + MOMENTUM.COMEBACK_RECOVERY_CREDIT)
+}
+
+/**
  * Applies a day rollover covering `missedScheduledDays` fully-missed days.
  *
  * Non-scheduled days never reach this function — the caller filters them out

@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { MOMENTUM, applyCompletionCredit, rollOverMomentum } from './momentum'
+import {
+  MOMENTUM,
+  applyComebackRecovery,
+  applyCompletionCredit,
+  rollOverMomentum,
+} from './momentum'
 
 describe('MOMENTUM constants', () => {
   it('keeps a floor above zero, so momentum never reads as total failure', () => {
@@ -78,6 +83,26 @@ describe('applyCompletionCredit', () => {
       delta: 0,
       creditedToday: 5,
     })
+  })
+})
+
+describe('applyComebackRecovery', () => {
+  it('credits the comeback recovery on top of the current momentum', () => {
+    expect(applyComebackRecovery(50)).toBe(50 + MOMENTUM.COMEBACK_RECOVERY_CREDIT)
+  })
+
+  it('lifts a returning user off the floor by the full credit', () => {
+    expect(applyComebackRecovery(MOMENTUM.MIN)).toBe(
+      MOMENTUM.MIN + MOMENTUM.COMEBACK_RECOVERY_CREDIT,
+    )
+  })
+
+  it('never exceeds MAX when the credit would overshoot it', () => {
+    expect(applyComebackRecovery(MOMENTUM.MAX - 1)).toBe(MOMENTUM.MAX)
+  })
+
+  it('stays at MAX when there is nothing left to recover', () => {
+    expect(applyComebackRecovery(MOMENTUM.MAX)).toBe(MOMENTUM.MAX)
   })
 })
 

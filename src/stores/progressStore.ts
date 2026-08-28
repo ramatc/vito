@@ -1,11 +1,7 @@
 import { create } from 'zustand'
+import { applyComebackToXp, startComeback } from '../domain/progression/comeback'
 import {
-  COMEBACK,
-  applyComebackToXp,
-  startComeback,
-} from '../domain/progression/comeback'
-import {
-  MOMENTUM,
+  applyComebackRecovery,
   applyCompletionCredit,
   rollOverMomentum,
 } from '../domain/progression/momentum'
@@ -171,14 +167,7 @@ export const useProgressStore = create<ProgressStore>()((set, get) => {
 
       await persist({
         ...progress,
-        // Clamped here rather than in `domain/progression/momentum.ts` only
-        // because that module ships no comeback-credit function yet; the
-        // constants are still domain-owned. See the PR3 apply notes — this
-        // belongs beside `applyCompletionCredit` as `applyComebackRecovery`.
-        momentum: Math.min(
-          progress.momentum + COMEBACK.MOMENTUM_RECOVERY_CREDIT,
-          MOMENTUM.MAX,
-        ),
+        momentum: applyComebackRecovery(progress.momentum),
         lastComebackDate: today,
         activeBoost: startComeback(today),
       })
