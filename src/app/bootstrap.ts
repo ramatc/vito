@@ -7,7 +7,7 @@ import {
 } from '../services/storage/repositories'
 import { useHabitStore } from '../stores/habitStore'
 import { useProgressStore } from '../stores/progressStore'
-import { setRepositories } from '../stores/repositories'
+import { getRepositories, setRepositories } from '../stores/repositories'
 import { useUiStore } from '../stores/uiStore'
 import { useVitoStore } from '../stores/vitoStore'
 import type { DateKey } from '../types/models'
@@ -17,6 +17,19 @@ import type { DateKey } from '../types/models'
  * and which stores need them. Everything below this file depends only on
  * interfaces.
  */
+
+/**
+ * Fills all three persisted stores from whatever the repositories currently
+ * hold. One list, used by startup and by a reset, so a fifth store cannot be
+ * added to one path and forgotten in the other.
+ */
+async function hydrateStores(): Promise<void> {
+  await Promise.all([
+    useHabitStore.getState().load(),
+    useProgressStore.getState().load(),
+    useVitoStore.getState().load(),
+  ])
+}
 
 /**
  * Brings the day up to date.
@@ -91,13 +104,29 @@ export async function bootstrap(): Promise<void> {
       .setStorageError(`Could not ${failure.operation} saved data: ${failure.message}`)
   })
 
-  await Promise.all([
-    useHabitStore.getState().load(),
-    useProgressStore.getState().load(),
-    useVitoStore.getState().load(),
-  ])
+  await hydrateStores()
 
   await runDayRollover()
+}
+
+/**
+ * Wipes every aggregate and reloads the stores from the empty store — Settings
+ * > Reset progress.
+ *
+ * Destructive and irreversible by design (§11): no snapshot, no undo, no trash.
+ * The order matters. Clearing storage first and reloading second is what makes
+ * the in-memory state and the saved state agree; calling each store's `reset()`
+ * instead would leave the habit list on disk, because `habitStore.reset()` only
+ * clears memory.
+ *
+ * The rollover deliberately does NOT run afterwards. A fresh profile has no
+ * anchor to measure from, so there is nothing to settle, and stamping
+ * `lastRolloverDate` here would leave the user on something other than the
+ * first-run defaults they just asked for.
+ */
+export async function resetAllData(): Promise<void> {
+  await getRepositories().resetAll()
+  await hydrateStores()
 }
 
 /**
