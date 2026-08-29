@@ -4,11 +4,12 @@ import { MOMENTUM } from '../domain/progression/momentum'
 import { useHabitStore } from '../stores/habitStore'
 import { useProgressStore } from '../stores/progressStore'
 import { setRepositories } from '../stores/repositories'
+import { useUiStore } from '../stores/uiStore'
 import { useVitoStore } from '../stores/vitoStore'
 import type { FakeSeed } from '../test/fakeRepositories'
 import { createFakeRepositories } from '../test/fakeRepositories'
 import type { Habit } from '../types/models'
-import { runDayRollover } from './bootstrap'
+import { resetAllData, runDayRollover } from './bootstrap'
 
 /**
  * The rollover is the one piece of app logic that runs without a user action,
@@ -48,6 +49,7 @@ const progressNow = () => useProgressStore.getState().progress
 
 beforeEach(() => {
   setRepositories(createFakeRepositories().repos)
+  useUiStore.setState({ reaction: null })
 })
 
 describe('runDayRollover — idempotence', () => {
@@ -206,5 +208,130 @@ describe('runDayRollover — the comeback boost', () => {
     await runDayRollover(TODAY)
 
     expect(progressNow().activeBoost).toBeNull()
+  })
+})
+
+/**
+ * The comeback is design §10's "welcome back" moment, and the rollover is the
+ * only place in the app that knows it happened. Without this the `wake` variant
+ * has no producer at all: `useCompleteHabit` only ever emits `celebrate`,
+ * `levelUp` or `unlock`.
+ */
+describe('runDayRollover — the welcome-back reaction', () => {
+  const reactionNow = () => useUiStore.getState().reaction
+
+  it('emits wake when the comeback triggers', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-06', lastRolloverDate: '2026-03-06' },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()?.type).toBe('wake')
+  })
+
+  it('emits nothing on an ordinary day', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-09', lastRolloverDate: '2026-03-09' },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
+  })
+
+  it('emits nothing when the cooldown suppresses the comeback', async () => {
+    await boot({
+      progress: {
+        lastActivityDate: '2026-03-06',
+        lastRolloverDate: '2026-03-06',
+        lastComebackDate: '2026-03-06',
+      },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
+  })
+
+  it('emits nothing on the second run of the same day', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-06', lastRolloverDate: '2026-03-06' },
+    })
+
+    await runDayRollover(TODAY)
+    useUiStore.setState({ reaction: null })
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
+  })
+})
+
+/**
+ * Reset is the one irreversible thing the app can do (design §11 accepts that
+ * for the MVP), so it has to be complete: a wipe that leaves one aggregate
+ * behind would resurrect old habits or old XP on the next reload.
+ */
+describe('resetAllData', () => {
+  const seeded = async () =>
+    boot({
+      completions: [
+        {
+          id: 'completion-1',
+          habitId: 'habit-read',
+          date: '2026-03-09',
+          xpAwarded: 20,
+          completedAt: '2026-03-09T08:00:00.000Z',
+        },
+      ],
+      progress: {
+        totalXp: 900,
+        momentum: 80,
+        currentStreak: 4,
+        longestStreak: 9,
+        lastActivityDate: '2026-03-09',
+        lastRolloverDate: '2026-03-09',
+      },
+      vito: {
+        equippedItems: { hat: 'hat-sprout' },
+        unlockedItemIds: ['hat-sprout'],
+      },
+    })
+
+  it('clears every stored aggregate', async () => {
+    const fake = await seeded()
+
+    await resetAllData()
+
+    expect(fake.data.habits).toEqual([])
+    expect(fake.data.completions).toEqual([])
+    expect(fake.data.progress.totalXp).toBe(0)
+    expect(fake.data.vito.unlockedItemIds).toEqual([])
+  })
+
+  it('rehydrates the stores to first-run defaults', async () => {
+    await seeded()
+
+    await resetAllData()
+
+    expect(useHabitStore.getState().habits).toEqual([])
+    expect(useHabitStore.getState().completions).toEqual([])
+    expect(progressNow().totalXp).toBe(0)
+    expect(progressNow().momentum).toBe(MOMENTUM.START)
+    expect(progressNow().currentStreak).toBe(0)
+    expect(progressNow().longestStreak).toBe(0)
+    expect(progressNow().lastActivityDate).toBeNull()
+    expect(useVitoStore.getState().vito.equippedItems).toEqual({})
+    expect(useVitoStore.getState().vito.unlockedItemIds).toEqual([])
+  })
+
+  it('leaves every store readable, not stuck loading', async () => {
+    await seeded()
+
+    await resetAllData()
+
+    expect(useHabitStore.getState().status).toBe('ready')
+    expect(useProgressStore.getState().status).toBe('ready')
+    expect(useVitoStore.getState().status).toBe('ready')
   })
 })

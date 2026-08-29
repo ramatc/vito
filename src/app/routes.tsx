@@ -1,11 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { Screen } from '../components/layout/Screen'
-import { Card } from '../components/ui/Card'
 import { HabitsScreen } from '../features/habits/HabitsScreen'
 import { TodayHabits } from '../features/habits/TodayHabits'
 import { ProgressSection } from '../features/progress/ProgressSection'
+import { ClosetScreen } from '../features/rewards/ClosetScreen'
+import { SettingsScreen } from '../features/settings/SettingsScreen'
 import { VitoStage } from '../features/vito/components/VitoStage'
+import { resetAllData } from './bootstrap'
 
 /**
  * The app's four surfaces, all nested inside `AppShell` so navigation is part of
@@ -30,24 +32,16 @@ function HomeRoute() {
   )
 }
 
-/** Placeholder until Phase 8 lands `features/rewards/ClosetScreen`. */
-function ClosetRoute() {
-  return (
-    <Screen title="Closet" description="Vito's wardrobe.">
-      <Card className="text-sm text-slate-600">
-        Cosmetics arrive here soon. Keep going — items unlock as Vito grows.
-      </Card>
-    </Screen>
-  )
-}
-
-/** Placeholder until Phase 8 lands `features/settings/SettingsScreen`. */
+/**
+ * Settings gets its destructive capability handed to it from here.
+ *
+ * `resetAllData` clears storage and rehydrates every store, which needs both
+ * the repositories and all three stores — composition-root reach that
+ * `features/` deliberately does not have. Injecting it keeps that fence intact
+ * and keeps the wipe visible at the root rather than buried in a screen.
+ */
 function SettingsRoute() {
-  return (
-    <Screen title="Settings" description="Your data stays on this device.">
-      <Card className="text-sm text-slate-600">Settings arrive here soon.</Card>
-    </Screen>
-  )
+  return <SettingsScreen onResetProgress={resetAllData} />
 }
 
 export function AppRoutes() {
@@ -56,7 +50,7 @@ export function AppRoutes() {
       <Route element={<AppShell />}>
         <Route index element={<HomeRoute />} />
         <Route path="habits" element={<HabitsScreen />} />
-        <Route path="closet" element={<ClosetRoute />} />
+        <Route path="closet" element={<ClosetScreen />} />
         <Route path="settings" element={<SettingsRoute />} />
         {/* An unknown URL lands on Today rather than on a dead end. */}
         <Route path="*" element={<Navigate to="/" replace />} />

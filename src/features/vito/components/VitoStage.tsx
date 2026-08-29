@@ -13,7 +13,7 @@ import { VitoAvatar } from './VitoAvatar'
  * below it takes props.
  */
 export function VitoStage() {
-  const { mood, stage, allDone } = useVito()
+  const { mood, stage, allDone, equippedItems } = useVito()
   const { boostActive } = useProgress()
   const message = moodMessage({ mood, allDone, boosted: boostActive })
 
@@ -22,7 +22,7 @@ export function VitoStage() {
       aria-label="Vito"
       className="flex flex-col items-center gap-2 rounded-3xl bg-gradient-to-b from-emerald-50 to-white px-4 pt-2 pb-5 ring-1 ring-emerald-100"
     >
-      <VitoAvatar stage={stage} mood={mood} allDone={allDone} />
+      <VitoAvatar stage={stage} mood={mood} allDone={allDone} equipped={equippedItems} />
       <MoodBubble headline={message.headline} body={message.body} />
     </section>
   )

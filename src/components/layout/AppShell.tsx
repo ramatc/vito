@@ -10,6 +10,17 @@ import { NAV_ITEMS } from './navItems'
  * Both navigations are always in the DOM and swapped by CSS rather than by a
  * media-query hook. A hook would need a resize listener, would render the wrong
  * one on the first paint, and would break when the viewport changes mid-session.
+ *
+ * This does NOT expose two navigation landmarks, which was the worry raised in
+ * PR4 review. Both classes compile to `display: none` (verified in the built
+ * stylesheet: `.hidden{display:none}` and, inside `@media (width>=48rem)`,
+ * `.md\:flex{display:flex}` and `.md\:hidden{display:none}`), and a
+ * `display: none` subtree is out of both the accessibility tree and the tab
+ * order. Exactly one `<nav>` is reachable at any width.
+ *
+ * So do not "fix" this with a static `aria-hidden` on either one: an attribute
+ * cannot track a media query, and whichever navigation carried it would be
+ * hidden from assistive tech at the width where it is the visible one.
  */
 export function AppShell() {
   return (
