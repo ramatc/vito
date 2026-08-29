@@ -6,6 +6,11 @@ import { cn } from '../../../utils/cn'
  * Presentational on purpose: the copy arrives as props from
  * `features/vito/copy/moodMessages`, which is the one file where the product's
  * voice gets reviewed.
+ *
+ * The bubble is a polite live region. Completing a habit changes what Vito says
+ * — often the most human feedback in the app — and without this a screen reader
+ * hears only the XP toast. Polite, never assertive: a mood is worth mentioning
+ * when the user next pauses, never worth cutting them off mid-sentence.
  */
 
 export interface MoodBubbleProps {
@@ -16,7 +21,11 @@ export interface MoodBubbleProps {
 
 export function MoodBubble({ headline, body, className }: MoodBubbleProps) {
   return (
-    <div className={cn('relative max-w-xs text-center', className)}>
+    <div
+      role="status"
+      aria-live="polite"
+      className={cn('relative max-w-xs text-center', className)}
+    >
       {/* The tail, pointing back up at Vito. Decorative, so it stays unlabelled. */}
       <span
         aria-hidden="true"
