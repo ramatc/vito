@@ -4,7 +4,7 @@ import {
   COMEBACK_MESSAGE,
   MOOD_MESSAGES,
   moodMessage,
-} from './moodMessages'
+} from '../moodMessages'
 
 /**
  * `moodMessage` is the single place that decides which line Vito says. The

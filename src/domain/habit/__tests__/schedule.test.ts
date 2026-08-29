@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import type { Habit, HabitCompletion } from '../../types/models'
+import type { Habit, HabitCompletion } from '../../../types/models'
 import {
   countMissedScheduledDays,
   habitsScheduledOn,
   isRestDay,
   isScheduledOn,
-} from './schedule'
+} from '../schedule'
 
 // 2026-03-08 is a Sunday, so the week below runs Sun(0) .. Sat(6).
 const SUNDAY = '2026-03-08'

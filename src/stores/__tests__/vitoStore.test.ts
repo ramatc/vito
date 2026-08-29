@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createFakeRepositories } from '../test/fakeRepositories'
-import { setRepositories } from './repositories'
-import { useVitoStore } from './vitoStore'
+import { createFakeRepositories } from '../../test/fakeRepositories'
+import { setRepositories } from '../repositories'
+import { useVitoStore } from '../vitoStore'
 
 /**
  * `equip` and `unequip` had no caller until the closet landed, and three of

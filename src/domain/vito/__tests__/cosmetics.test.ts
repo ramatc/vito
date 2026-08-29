@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { CosmeticItem, EquippedItems } from '../../types/models'
-import { COSMETIC_CATALOG } from './cosmeticCatalog'
+import type { CosmeticItem, EquippedItems } from '../../../types/models'
+import { COSMETIC_CATALOG } from '../cosmeticCatalog'
 import {
   SLOT_RENDER_ORDER,
   computeUnlockedIds,
   isUnlocked,
   resolveLayers,
-} from './cosmetics'
+} from '../cosmetics'
 
 const HAT: CosmeticItem = {
   id: 'hat-sprout',

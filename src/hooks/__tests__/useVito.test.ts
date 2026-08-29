@@ -1,11 +1,11 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { createFakeRepositories } from '../test/fakeRepositories'
-import { useHabitStore } from '../stores/habitStore'
-import { useProgressStore } from '../stores/progressStore'
-import { setRepositories } from '../stores/repositories'
-import { useVitoStore } from '../stores/vitoStore'
-import { useVito } from './useVito'
+import { createFakeRepositories } from '../../test/fakeRepositories'
+import { useHabitStore } from '../../stores/habitStore'
+import { useProgressStore } from '../../stores/progressStore'
+import { setRepositories } from '../../stores/repositories'
+import { useVitoStore } from '../../stores/vitoStore'
+import { useVito } from '../useVito'
 
 /**
  * The two guards in `useVito` that never had a test: the divide-by-zero on a

@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { MOMENTUM } from '../../domain/progression/momentum'
-import type { Habit, HabitCompletion } from '../../types/models'
-import { createDefaultUserProgress, createDefaultVitoState } from './defaults'
+import { MOMENTUM } from '../../../domain/progression/momentum'
+import type { Habit, HabitCompletion } from '../../../types/models'
+import { createDefaultUserProgress, createDefaultVitoState } from '../defaults'
 import {
   SCHEMA_VERSION,
   STORAGE_KEYS,
   setStorageErrorHandler,
-} from './localStorageClient'
-import { createRepositories } from './repositories'
+} from '../localStorageClient'
+import { createRepositories } from '../repositories'
 
 /**
  * These tests exist for the failure paths. A repository that throws on corrupt

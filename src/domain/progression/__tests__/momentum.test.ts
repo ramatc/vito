@@ -4,7 +4,7 @@ import {
   applyComebackRecovery,
   applyCompletionCredit,
   rollOverMomentum,
-} from './momentum'
+} from '../momentum'
 
 describe('MOMENTUM constants', () => {
   it('keeps a floor above zero, so momentum never reads as total failure', () => {
