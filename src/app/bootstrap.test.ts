@@ -4,6 +4,7 @@ import { MOMENTUM } from '../domain/progression/momentum'
 import { useHabitStore } from '../stores/habitStore'
 import { useProgressStore } from '../stores/progressStore'
 import { setRepositories } from '../stores/repositories'
+import { useUiStore } from '../stores/uiStore'
 import { useVitoStore } from '../stores/vitoStore'
 import type { FakeSeed } from '../test/fakeRepositories'
 import { createFakeRepositories } from '../test/fakeRepositories'
@@ -48,6 +49,7 @@ const progressNow = () => useProgressStore.getState().progress
 
 beforeEach(() => {
   setRepositories(createFakeRepositories().repos)
+  useUiStore.setState({ reaction: null })
 })
 
 describe('runDayRollover — idempotence', () => {
@@ -206,5 +208,61 @@ describe('runDayRollover — the comeback boost', () => {
     await runDayRollover(TODAY)
 
     expect(progressNow().activeBoost).toBeNull()
+  })
+})
+
+/**
+ * The comeback is design §10's "welcome back" moment, and the rollover is the
+ * only place in the app that knows it happened. Without this the `wake` variant
+ * has no producer at all: `useCompleteHabit` only ever emits `celebrate`,
+ * `levelUp` or `unlock`.
+ */
+describe('runDayRollover — the welcome-back reaction', () => {
+  const reactionNow = () => useUiStore.getState().reaction
+
+  it('emits wake when the comeback triggers', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-06', lastRolloverDate: '2026-03-06' },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()?.type).toBe('wake')
+  })
+
+  it('emits nothing on an ordinary day', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-09', lastRolloverDate: '2026-03-09' },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
+  })
+
+  it('emits nothing when the cooldown suppresses the comeback', async () => {
+    await boot({
+      progress: {
+        lastActivityDate: '2026-03-06',
+        lastRolloverDate: '2026-03-06',
+        lastComebackDate: '2026-03-06',
+      },
+    })
+
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
+  })
+
+  it('emits nothing on the second run of the same day', async () => {
+    await boot({
+      progress: { lastActivityDate: '2026-03-06', lastRolloverDate: '2026-03-06' },
+    })
+
+    await runDayRollover(TODAY)
+    useUiStore.setState({ reaction: null })
+    await runDayRollover(TODAY)
+
+    expect(reactionNow()).toBeNull()
   })
 })

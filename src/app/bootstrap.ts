@@ -64,6 +64,13 @@ export async function runDayRollover(today: DateKey = todayKey()): Promise<void>
     })
   ) {
     await useProgressStore.getState().startComeback(today)
+
+    // Design §10's "welcome back" moment, and the only producer of the `wake`
+    // reaction — a comeback is the one event nobody clicks, so no hook is in a
+    // position to broadcast it. This file is already where storage and the UI
+    // store are joined, which keeps the rule intact that no *store* writes to
+    // `uiStore`: the composition root does.
+    useUiStore.getState().emitReaction('wake')
   }
 }
 
