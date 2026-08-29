@@ -104,14 +104,26 @@ export function VitoAvatar({ stage, mood, allDone = false, className }: VitoAvat
 
     let live = true
 
-    void controls.start(variants[reaction.type]).then(() => {
-      // Guarded by the nonce inside `endReaction`, and by `live` here: a
-      // reaction that resolves after its component has moved on must not drag
-      // the avatar out of whatever it is doing now.
-      if (live) {
-        endReaction(reaction.nonce)
+    const play = async () => {
+      try {
+        await controls.start(variants[reaction.type])
+      } catch (error) {
+        // Purely cosmetic: a failed animation must never blank the whole app
+        // via the boundary. There is no error reporting elsewhere in this
+        // codebase, so this is deliberately the same `console.error` level as
+        // everything else.
+        console.error('Vito failed to play a reaction animation', error)
+      } finally {
+        // Guarded by the nonce inside `endReaction`, and by `live` here: a
+        // reaction that resolves after its component has moved on must not drag
+        // the avatar out of whatever it is doing now.
+        if (live) {
+          endReaction(reaction.nonce)
+        }
       }
-    })
+    }
+
+    void play()
 
     return () => {
       live = false

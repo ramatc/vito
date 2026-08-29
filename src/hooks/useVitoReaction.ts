@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useLayoutEffect } from 'react'
 import { useReducedMotion } from 'framer-motion'
 import type { Reaction } from '../stores/uiStore'
 import { useUiStore } from '../stores/uiStore'
@@ -33,6 +33,19 @@ import { useUiStore } from '../stores/uiStore'
  */
 export const REACTION_TIMEOUT_MS = 2500
 
+/**
+ * How old a reaction can be and still be considered "just happened".
+ *
+ * `uiStore.reaction` is a broadcast channel with no consumer on `/habits` —
+ * completing a habit there latches a reaction with nothing mounted to clear
+ * it. If the user then navigates to Home, a fresh `VitoAvatar` would
+ * otherwise pick up that stale reaction and play a desynced animation for an
+ * event that may have happened minutes ago. Same order of magnitude as
+ * `REACTION_TIMEOUT_MS`: anything older than this predates the current mount
+ * and is discarded rather than replayed out of context.
+ */
+export const REACTION_STALE_MS = 3000
+
 export interface VitoReaction {
   /** The reaction playing right now, or `null` while Vito is just idling. */
   reaction: Reaction | null
@@ -46,7 +59,7 @@ export interface VitoReaction {
 }
 
 export function useVitoReaction(): VitoReaction {
-  const reaction = useUiStore((state) => state.reaction)
+  const storeReaction = useUiStore((state) => state.reaction)
   const prefersReducedMotion = useReducedMotion() ?? false
 
   const endReaction = useCallback((nonce: number) => {
@@ -56,6 +69,24 @@ export function useVitoReaction(): VitoReaction {
       useUiStore.getState().clearReaction()
     }
   }, [])
+
+  // Discards a reaction that is too old to be "still current" instead of
+  // replaying it out of context — synchronously before paint, not in a plain
+  // effect, or the caller below would render the stale reaction for one
+  // frame. `Date.now()` cannot be called during render (React purity), so
+  // the check lives here; it clears the *store*, not local component state,
+  // so it does not reintroduce the mirrored-state pattern this hook
+  // deliberately avoids (see module doc above).
+  useLayoutEffect(() => {
+    if (
+      storeReaction !== null &&
+      Date.now() - storeReaction.emittedAt > REACTION_STALE_MS
+    ) {
+      endReaction(storeReaction.nonce)
+    }
+  }, [storeReaction, endReaction])
+
+  const reaction = storeReaction
 
   useEffect(() => {
     if (reaction === null) {

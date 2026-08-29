@@ -11,7 +11,7 @@ import { newId } from '../utils/id'
  * subtrees, which is why a shared store beats prop drilling here.
  */
 
-export type ReactionType = 'idle' | 'celebrate' | 'levelUp' | 'unlock' | 'wake'
+export type ReactionType = 'celebrate' | 'levelUp' | 'unlock' | 'wake'
 
 export interface Reaction {
   type: ReactionType
@@ -23,6 +23,16 @@ export interface Reaction {
    * silently fail to replay. The nonce makes every emission distinct.
    */
   nonce: number
+  /**
+   * Wall-clock time the reaction was emitted.
+   *
+   * The only consumer of `reaction` is whichever `VitoAvatar` happens to be
+   * mounted, and a habit can be completed from `/habits`, where nothing is
+   * mounted to react. This timestamp is how a `VitoAvatar` that mounts later
+   * — on navigating back to Home — can tell a reaction that just happened
+   * apart from one it merely inherited from the store.
+   */
+  emittedAt: number
 }
 
 export interface Toast {
@@ -57,7 +67,7 @@ export const useUiStore = create<UiStore>()((set, get) => ({
 
   emitReaction: (type) => {
     reactionNonce += 1
-    set({ reaction: { type, nonce: reactionNonce } })
+    set({ reaction: { type, nonce: reactionNonce, emittedAt: Date.now() } })
   },
 
   clearReaction: () => {

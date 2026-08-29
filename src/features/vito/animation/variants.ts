@@ -14,7 +14,7 @@ import type { ReactionType } from '../../../stores/uiStore'
 /**
  * What the avatar can be doing.
  *
- * The five `ReactionType` values are transient — something happened, Vito
+ * The four `ReactionType` values are transient — something happened, Vito
  * reacts, Vito goes back to what he was doing. `idle`, `resting` and `cheer`
  * are the loops he goes back TO, chosen from mood rather than from an event,
  * which is why they are not reactions and do not live in the store's union.
