@@ -188,9 +188,39 @@
                   "!../domain/*/*",
                   "!../stores/*",
                   "!../utils/*",
-                  "!react"
+                  "!react",
+                  "!framer-motion"
                 ],
-                "message": "hooks/ is the derivation ring: it may import React, src/stores/**, src/domain/**, src/types/** and src/utils/**. No components/ or features/ — a hook that renders is a component."
+                "message": "hooks/ is the derivation ring: it may import React, framer-motion's hooks, src/stores/**, src/domain/**, src/types/** and src/utils/**. No components/ or features/ — a hook that renders is a component, and motion CONFIGS still live only in features/vito/animation/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/hooks/*.test.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../types/*",
+                  "!../domain/*/*",
+                  "!../stores/*",
+                  "!../utils/*",
+                  "!../test/*",
+                  "!react",
+                  "!framer-motion",
+                  "!vitest",
+                  "!@testing-library/react"
+                ],
+                "message": "A hooks test may import exactly what the hook under test may import, plus the test runner, Testing Library and the shared fakes in src/test/."
               }
             ]
           }
@@ -292,6 +322,74 @@
       }
     },
     {
+      "files": ["src/features/*/*/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../*/*",
+                  "!../../*/*",
+                  "!../../../components/*/*",
+                  "!../../../hooks/*",
+                  "!../../../stores/*",
+                  "!../../../domain/*/*",
+                  "!../../../types/*",
+                  "!../../../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!lucide-react"
+                ],
+                "message": "A nested feature directory (features/<feature>/<dir>/<file>) gets exactly what features/<feature>/<file> gets, one level deeper: its own directory, its feature's other directories, other features' top-level files, components/, hooks/, stores/, domain/, types/ and utils/. Still no services/storage."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/features/*/*/*.test.ts", "src/features/*/*/*.test.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!./*",
+                  "!../*/*",
+                  "!../../*/*",
+                  "!../../../components/*/*",
+                  "!../../../hooks/*",
+                  "!../../../stores/*",
+                  "!../../../domain/*/*",
+                  "!../../../types/*",
+                  "!../../../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!lucide-react",
+                  "!vitest",
+                  "!@testing-library/react"
+                ],
+                "message": "A nested feature test may import exactly what the module under test may import, plus the test runner and Testing Library."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/app/*"],
       "rules": {
         "no-restricted-imports": [
@@ -310,6 +408,7 @@
                   "!../hooks/*",
                   "!../components/*/*",
                   "!../features/*/*",
+                  "!../features/*/*/*",
                   "!../utils/*",
                   "!react",
                   "!react/*",
@@ -344,6 +443,7 @@
                   "!../hooks/*",
                   "!../components/*/*",
                   "!../features/*/*",
+                  "!../features/*/*/*",
                   "!../test/*",
                   "!../utils/*",
                   "!react",

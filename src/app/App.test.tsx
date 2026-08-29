@@ -16,5 +16,8 @@ describe('App', () => {
     expect(
       screen.getByRole('navigation', { name: 'Primary sidebar' }),
     ).toBeInTheDocument()
+    // Home's new contract (PR5): Vito and the progress bars both render.
+    expect(screen.getByRole('region', { name: 'Vito' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: 'Your progress' })).toBeInTheDocument()
   })
 })
