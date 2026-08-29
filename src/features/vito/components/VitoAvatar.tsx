@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
 import { motion, useAnimationControls } from 'framer-motion'
+import { COSMETIC_CATALOG } from '../../../domain/vito/cosmeticCatalog'
+import { resolveLayers } from '../../../domain/vito/cosmetics'
 import type { EvolutionStage } from '../../../domain/vito/evolution'
 import type { Mood } from '../../../domain/vito/mood'
 import { useVitoReaction } from '../../../hooks/useVitoReaction'
+import type { EquippedItems } from '../../../types/models'
 import { cn } from '../../../utils/cn'
+import { COSMETIC_ASSETS } from '../../rewards/cosmeticAssets'
 import { idleStateFor, reducedVitoVariants, vitoVariants } from '../animation/variants'
 import { MOOD_ALT_TEXT } from '../copy/moodMessages'
 
@@ -80,20 +84,41 @@ function mouthClass(mood: Mood): string {
   }
 }
 
+/** "wearing X and Y", or nothing at all when he is going as himself. */
+function wornDescription(itemIds: readonly string[]): string {
+  const names = COSMETIC_CATALOG.filter((item) => itemIds.includes(item.id)).map(
+    (item) => item.name,
+  )
+
+  return names.length === 0 ? '' : `, wearing ${names.join(' and ')}`
+}
+
 export interface VitoAvatarProps {
   stage: EvolutionStage
   mood: Mood
   /** Today's whole list is done — Vito keeps celebrating until tomorrow. */
   allDone?: boolean
+  /** Cosmetics worn right now. Slots are independent; order is not this map's job. */
+  equipped?: EquippedItems
   className?: string
 }
 
-export function VitoAvatar({ stage, mood, allDone = false, className }: VitoAvatarProps) {
+export function VitoAvatar({
+  stage,
+  mood,
+  allDone = false,
+  equipped = {},
+  className,
+}: VitoAvatarProps) {
   const { reaction, prefersReducedMotion, endReaction } = useVitoReaction()
   const controls = useAnimationControls()
   const look = STAGE_LOOK[stage]
   const idleState = idleStateFor({ mood, allDone })
   const variants = prefersReducedMotion ? reducedVitoVariants : vitoVariants
+  // Depth comes from the slot's fixed place in `SLOT_RENDER_ORDER`, resolved in
+  // the domain. This component never names a slot, which is what lets a fourth
+  // one be added as pure data later (design §7).
+  const layers = resolveLayers(equipped, COSMETIC_CATALOG)
 
   useEffect(() => {
     if (reaction === null) {
@@ -136,7 +161,9 @@ export function VitoAvatar({ stage, mood, allDone = false, className }: VitoAvat
       // One name for the whole drawing. Without it a screen reader gets a pile
       // of empty decorative spans and learns nothing.
       role="img"
-      aria-label={`Vito, ${look.description}, ${MOOD_ALT_TEXT[mood]}`}
+      aria-label={`Vito, ${look.description}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
+        layers.map((layer) => layer.itemId),
+      )}`}
     >
       <motion.div animate={controls} className="relative">
         <span
@@ -160,6 +187,26 @@ export function VitoAvatar({ stage, mood, allDone = false, className }: VitoAvat
             <span className={mouthClass(mood)} />
           </div>
         </div>
+
+        {layers.map((layer) => {
+          const Asset = COSMETIC_ASSETS[layer.assetRef]
+
+          // A catalog entry whose art has not landed yet is skipped rather than
+          // crashed on, the same way `resolveLayers` skips an unknown id.
+          if (Asset === undefined) {
+            return null
+          }
+
+          return (
+            <span
+              key={layer.slot}
+              className="absolute inset-0"
+              style={{ zIndex: layer.z }}
+            >
+              <Asset />
+            </span>
+          )
+        })}
       </motion.div>
     </div>
   )
