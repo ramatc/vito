@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useUiStore } from '../../../stores/uiStore'
-import { VitoAvatar } from './VitoAvatar'
+import { useUiStore } from '../../../../stores/uiStore'
+import { VitoAvatar } from '../VitoAvatar'
 
 /**
  * Fix 2 (WARNING, judgment-day review): `controls.start(...)` had no

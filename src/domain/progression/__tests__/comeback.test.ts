@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { ComebackBoost } from '../../types/models'
-import { MOMENTUM } from './momentum'
+import type { ComebackBoost } from '../../../types/models'
+import { MOMENTUM } from '../momentum'
 import {
   COMEBACK,
   applyComebackToXp,
   shouldTriggerComeback,
   startComeback,
-} from './comeback'
+} from '../comeback'
 
 const TODAY = '2026-03-20'
 

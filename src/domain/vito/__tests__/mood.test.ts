@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { MoodInput } from './mood'
-import { MOOD_RULES, MOOD_THRESHOLDS, deriveMood } from './mood'
+import type { MoodInput } from '../mood'
+import { MOOD_RULES, MOOD_THRESHOLDS, deriveMood } from '../mood'
 
 function input(overrides: Partial<MoodInput> = {}): MoodInput {
   return {

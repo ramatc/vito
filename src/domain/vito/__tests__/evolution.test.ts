@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { EVOLUTION_BRACKETS, getEvolutionStage } from './evolution'
+import { EVOLUTION_BRACKETS, getEvolutionStage } from '../evolution'
 
 describe('EVOLUTION_BRACKETS', () => {
   it('lists four stages with strictly increasing entry levels', () => {

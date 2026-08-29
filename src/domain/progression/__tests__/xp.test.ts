@@ -5,7 +5,7 @@ import {
   calculateProgressToNextLevel,
   calculateXpForNextLevel,
   xpThresholdForLevel,
-} from './xp'
+} from '../xp'
 
 const ALL_LEVELS = Array.from({ length: LEVEL_CURVE.MAX_LEVEL }, (_, i) => i + 1)
 

@@ -96,21 +96,14 @@
       }
     },
     {
-      "files": ["src/services/storage/*.test.ts"],
+      "files": ["src/services/storage/__tests__/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!../../types/*",
-                  "!../../domain/*/*",
-                  "!vitest"
-                ],
+                "group": ["*", "**", "!../*", "!../../../types/*", "!../../../domain/*/*", "!vitest"],
                 "message": "A storage test may import exactly what the modules under test may import, plus the bare `vitest` specifier."
               }
             ]
@@ -145,26 +138,14 @@
       }
     },
     {
-      "files": ["src/stores/*.test.ts"],
+      "files": ["src/stores/__tests__/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!../types/*",
-                  "!../domain/*/*",
-                  "!../services/storage/repositories",
-                  "!../services/storage/defaults",
-                  "!../test/*",
-                  "!../utils/*",
-                  "!zustand",
-                  "!vitest"
-                ],
+                "group": ["*", "**", "!../*", "!../../types/*", "!../../domain/*/*", "!../../services/storage/repositories", "!../../services/storage/defaults", "!../../test/*", "!../../utils/*", "!zustand", "!vitest"],
                 "message": "A store test may import exactly what the store under test may import, plus the bare `vitest` specifier and the shared fakes in src/test/."
               }
             ]
@@ -199,27 +180,14 @@
       }
     },
     {
-      "files": ["src/hooks/*.test.ts"],
+      "files": ["src/hooks/__tests__/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!../types/*",
-                  "!../domain/*/*",
-                  "!../stores/*",
-                  "!../utils/*",
-                  "!../test/*",
-                  "!react",
-                  "!framer-motion",
-                  "!vitest",
-                  "!@testing-library/react"
-                ],
+                "group": ["*", "**", "!../*", "!../../types/*", "!../../domain/*/*", "!../../stores/*", "!../../utils/*", "!../../test/*", "!react", "!framer-motion", "!vitest", "!@testing-library/react"],
                 "message": "A hooks test may import exactly what the hook under test may import, plus the test runner, Testing Library and the shared fakes in src/test/."
               }
             ]
@@ -355,33 +323,14 @@
       }
     },
     {
-      "files": ["src/features/*/*/*.test.ts", "src/features/*/*/*.test.tsx"],
+      "files": ["src/features/*/*/__tests__/*.test.ts", "src/features/*/*/__tests__/*.test.tsx"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!../*/*",
-                  "!../../*/*",
-                  "!../../../components/*/*",
-                  "!../../../hooks/*",
-                  "!../../../stores/*",
-                  "!../../../domain/*/*",
-                  "!../../../types/*",
-                  "!../../../utils/*",
-                  "!react",
-                  "!react/*",
-                  "!react-router-dom",
-                  "!framer-motion",
-                  "!lucide-react",
-                  "!vitest",
-                  "!@testing-library/react"
-                ],
+                "group": ["*", "**", "!../*", "!../../*/*", "!../../../*/*", "!../../../../components/*/*", "!../../../../hooks/*", "!../../../../stores/*", "!../../../../domain/*/*", "!../../../../types/*", "!../../../../utils/*", "!react", "!react/*", "!react-router-dom", "!framer-motion", "!lucide-react", "!vitest", "!@testing-library/react"],
                 "message": "A nested feature test may import exactly what the module under test may import, plus the test runner and Testing Library."
               }
             ]
@@ -425,37 +374,14 @@
       }
     },
     {
-      "files": ["src/app/*.test.ts", "src/app/*.test.tsx"],
+      "files": ["src/app/__tests__/*.test.ts", "src/app/__tests__/*.test.tsx"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!../types/*",
-                  "!../domain/*/*",
-                  "!../stores/*",
-                  "!../services/storage/repositories",
-                  "!../hooks/*",
-                  "!../components/*/*",
-                  "!../features/*/*",
-                  "!../features/*/*/*",
-                  "!../test/*",
-                  "!../utils/*",
-                  "!react",
-                  "!react/*",
-                  "!react-dom",
-                  "!react-dom/*",
-                  "!react-router-dom",
-                  "!framer-motion",
-                  "!vitest",
-                  "!@testing-library/react",
-                  "!@testing-library/user-event"
-                ],
+                "group": ["*", "**", "!../*", "!../../types/*", "!../../domain/*/*", "!../../stores/*", "!../../services/storage/repositories", "!../../hooks/*", "!../../components/*/*", "!../../features/*/*", "!../../features/*/*/*", "!../../test/*", "!../../utils/*", "!react", "!react/*", "!react-dom", "!react-dom/*", "!react-router-dom", "!framer-motion", "!vitest", "!@testing-library/react", "!@testing-library/user-event"],
                 "message": "An app test may import exactly what the module under test may import, plus the test runner, Testing Library and the shared fakes in src/test/."
               }
             ]
@@ -464,24 +390,14 @@
       }
     },
     {
-      "files": ["src/domain/*/*.test.ts"],
+      "files": ["src/domain/*/__tests__/*.test.ts"],
       "rules": {
         "no-restricted-imports": [
           "error",
           {
             "patterns": [
               {
-                "group": [
-                  "*",
-                  "**",
-                  "!./*",
-                  "!./**",
-                  "!../*",
-                  "!../*/*",
-                  "!../../types/*",
-                  "!../../types/**",
-                  "!vitest"
-                ],
+                "group": ["*", "**", "!../*", "!../**", "!../../*", "!../../*/*", "!../../../types/*", "!../../../types/**", "!vitest"],
                 "message": "A domain test may import exactly what the module under test may import, plus the bare `vitest` specifier. No React, no stores, no utils/ — if a domain test needs those, the logic under test is in the wrong ring."
               }
             ]

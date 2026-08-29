@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import App from './App'
+import App from '../App'
 
 // Relocated from the PR1 smoke test at src/App.test.tsx, which rendered the
 // placeholder shell this phase deleted. Still the same job: prove jsdom, React

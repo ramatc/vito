@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { StreakState } from './streak'
-import { STREAK, updateStreak } from './streak'
+import type { StreakState } from '../streak'
+import { STREAK, updateStreak } from '../streak'
 
 const MONDAY = '2026-03-09'
 const TUESDAY = '2026-03-10'

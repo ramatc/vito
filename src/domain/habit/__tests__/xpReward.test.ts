@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { Difficulty } from '../../types/models'
-import { XP_BY_DIFFICULTY, xpRewardFor } from './xpReward'
+import type { Difficulty } from '../../../types/models'
+import { XP_BY_DIFFICULTY, xpRewardFor } from '../xpReward'
 
 describe('xpRewardFor', () => {
   it('awards 10 XP for an easy habit', () => {

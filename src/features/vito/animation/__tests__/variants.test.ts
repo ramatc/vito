@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { idleStateFor } from './variants'
+import { idleStateFor } from '../variants'
 
 /**
  * `idleStateFor` picks which loop Vito falls back to when no reaction is

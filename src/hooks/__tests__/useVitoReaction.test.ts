@@ -1,11 +1,11 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useUiStore } from '../stores/uiStore'
+import { useUiStore } from '../../stores/uiStore'
 import {
   REACTION_STALE_MS,
   REACTION_TIMEOUT_MS,
   useVitoReaction,
-} from './useVitoReaction'
+} from '../useVitoReaction'
 
 /**
  * `useVitoReaction` is the state machine behind "Vito reacts": it releases a

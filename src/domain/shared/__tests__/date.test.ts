@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { addDays, daysBetween, eachDay, todayKey, weekdayOf } from './date'
+import { addDays, daysBetween, eachDay, todayKey, weekdayOf } from '../date'
 
 afterEach(() => {
   vi.useRealTimers()
