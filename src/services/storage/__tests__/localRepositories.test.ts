@@ -1,7 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MOMENTUM } from '../../../domain/progression/momentum'
 import type { Habit, HabitCompletion } from '../../../types/models'
-import { createDefaultUserProgress, createDefaultVitoState } from '../defaults'
+import {
+  createDefaultPreferences,
+  createDefaultUserProgress,
+  createDefaultVitoState,
+} from '../defaults'
 import {
   SCHEMA_VERSION,
   STORAGE_KEYS,
@@ -50,9 +54,33 @@ function failures() {
   return collected
 }
 
+/**
+ * Preference detection reads two browser facts, and jsdom supplies neither
+ * usefully: `navigator.language` is pinned to `en-US`, and `matchMedia` does not
+ * exist at all. Both are stubbed as own properties so deleting them afterwards
+ * restores the real prototype getter rather than leaving a fake behind.
+ */
+function browserSpeaks(language: string): void {
+  Object.defineProperty(navigator, 'language', { value: language, configurable: true })
+}
+
+function osPrefersDark(dark: boolean): void {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: (query: string) => ({
+      matches: dark && query.includes('prefers-color-scheme: dark'),
+    }),
+  })
+}
+
 beforeEach(() => {
   setStorageErrorHandler(null)
   vi.restoreAllMocks()
+})
+
+afterEach(() => {
+  Reflect.deleteProperty(navigator, 'language')
+  Reflect.deleteProperty(window, 'matchMedia')
 })
 
 describe('habit repository', () => {
@@ -210,6 +238,147 @@ describe('vito repository', () => {
   })
 })
 
+/**
+ * Detection runs exactly once, on a profile that has never saved a preference.
+ * Everything after that comes from storage, which is what makes a manual
+ * override survive a reload — see the "not re-detected" case below.
+ */
+describe('createDefaultPreferences', () => {
+  it('starts in Spanish when the browser reports a Spanish locale', () => {
+    browserSpeaks('es-AR')
+
+    expect(createDefaultPreferences().locale).toBe('es')
+  })
+
+  it('starts in Spanish for a bare `es`, not only for a regional variant', () => {
+    browserSpeaks('es')
+
+    expect(createDefaultPreferences().locale).toBe('es')
+  })
+
+  it('is not fooled by casing, which browsers do vary', () => {
+    browserSpeaks('ES-AR')
+
+    expect(createDefaultPreferences().locale).toBe('es')
+  })
+
+  it('starts in English for an English regional variant', () => {
+    browserSpeaks('en-GB')
+
+    expect(createDefaultPreferences().locale).toBe('en')
+  })
+
+  it('falls back to English for a language the app does not ship', () => {
+    browserSpeaks('fr-FR')
+
+    expect(createDefaultPreferences().locale).toBe('en')
+  })
+
+  it('starts dark when the OS asks for dark', () => {
+    osPrefersDark(true)
+
+    expect(createDefaultPreferences().theme).toBe('dark')
+  })
+
+  it('starts light when the OS asks for light', () => {
+    osPrefersDark(false)
+
+    expect(createDefaultPreferences().theme).toBe('light')
+  })
+
+  /**
+   * The guard that matters most in this file: jsdom implements no `matchMedia`,
+   * so an unguarded call here would not fail one assertion — it would throw out
+   * of every store that reads first-run defaults at module scope.
+   */
+  it('starts light instead of throwing where matchMedia does not exist', () => {
+    expect(window.matchMedia).toBeUndefined()
+    expect(createDefaultPreferences()).toEqual({ locale: 'en', theme: 'light' })
+  })
+})
+
+describe('preferences repository', () => {
+  it('round-trips a saved language and theme', async () => {
+    const repos = createRepositories()
+
+    await repos.preferences.save({ locale: 'es', theme: 'dark' })
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'es',
+      theme: 'dark',
+    })
+  })
+
+  it('detects from the browser on a first run, when nothing has been saved', async () => {
+    browserSpeaks('es-AR')
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'es',
+      theme: 'light',
+    })
+  })
+
+  it('does not re-detect once a choice has been saved', async () => {
+    const repos = createRepositories()
+    await repos.preferences.save({ locale: 'en', theme: 'dark' })
+
+    // The browser now disagrees with the saved choice. The saved choice wins.
+    browserSpeaks('es-AR')
+    osPrefersDark(false)
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'en',
+      theme: 'dark',
+    })
+  })
+
+  it('falls back to the detected defaults when the stored value is corrupt JSON', async () => {
+    const reported = failures()
+    localStorage.setItem(STORAGE_KEYS.preferences, '{ half written')
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'en',
+      theme: 'light',
+    })
+    expect(reported).toContainEqual({
+      operation: 'read',
+      key: STORAGE_KEYS.preferences,
+    })
+  })
+
+  it('keeps the usable field when only the language is unrecognised', async () => {
+    localStorage.setItem(
+      STORAGE_KEYS.preferences,
+      JSON.stringify({ locale: 'fr', theme: 'dark' }),
+    )
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'en',
+      theme: 'dark',
+    })
+  })
+
+  it('keeps the usable field when only the theme is unrecognised', async () => {
+    localStorage.setItem(
+      STORAGE_KEYS.preferences,
+      JSON.stringify({ locale: 'es', theme: 'neon' }),
+    )
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual({
+      locale: 'es',
+      theme: 'light',
+    })
+  })
+
+  it('rejects a stored array and returns defaults, since preferences are an object', async () => {
+    localStorage.setItem(STORAGE_KEYS.preferences, '[]')
+
+    await expect(createRepositories().preferences.get()).resolves.toEqual(
+      createDefaultPreferences(),
+    )
+  })
+})
+
 describe('write failures', () => {
   it('does not reject when localStorage is out of quota', async () => {
     const reported = failures()
@@ -249,9 +418,10 @@ describe('resetAll', () => {
     })
 
     // Everything except the schema marker, which is metadata about the build
-    // rather than user data and outlives a reset.
+    // rather than user data, and the preferences, which are chrome rather than
+    // progress. Both outlive a reset; the preferences case is pinned below.
     const dataKeys = Object.values(STORAGE_KEYS).filter(
-      (key) => key !== STORAGE_KEYS.schema,
+      (key) => key !== STORAGE_KEYS.schema && key !== STORAGE_KEYS.preferences,
     )
     expect(dataKeys.filter((key) => localStorage.getItem(key) !== null)).toEqual(dataKeys)
 
@@ -277,6 +447,34 @@ describe('resetAll', () => {
     await repos.resetAll()
 
     expect(localStorage.getItem('someone-elses-key')).toBe('keep me')
+  })
+
+  /**
+   * Starting over puts Vito back at day one. It does not put the app back into
+   * a language the user does not read, or into a theme that hurts to look at —
+   * neither is progress, and neither is what the button offered to clear.
+   */
+  it('keeps the saved language and theme, which are chrome rather than progress', async () => {
+    const repos = createRepositories()
+    await repos.preferences.save({ locale: 'es', theme: 'dark' })
+    await repos.habits.create(habit())
+
+    await repos.resetAll()
+
+    await expect(repos.preferences.get()).resolves.toEqual({
+      locale: 'es',
+      theme: 'dark',
+    })
+    await expect(repos.habits.getAll()).resolves.toEqual([])
+  })
+
+  it('leaves the preferences key itself in storage, not merely its values', async () => {
+    const repos = createRepositories()
+    await repos.preferences.save({ locale: 'es', theme: 'dark' })
+
+    await repos.resetAll()
+
+    expect(localStorage.getItem(STORAGE_KEYS.preferences)).not.toBeNull()
   })
 
   it('returns first-run defaults after a reset', async () => {

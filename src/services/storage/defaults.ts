@@ -1,5 +1,12 @@
 import { MOMENTUM } from '../../domain/progression/momentum'
-import type { DateKey, UserProgress, VitoState } from '../../types/models'
+import type {
+  AppPreferences,
+  DateKey,
+  Locale,
+  Theme,
+  UserProgress,
+  VitoState,
+} from '../../types/models'
 
 /**
  * First-run state — what a brand new profile looks like, and what a corrupt
@@ -38,4 +45,46 @@ export function createDefaultUserProgress(): UserProgress {
 
 export function createDefaultVitoState(): VitoState {
   return { equippedItems: {}, unlockedItemIds: [] }
+}
+
+/**
+ * Reads the browser's language once, and answers with a bucket the app ships.
+ *
+ * Prefix-matched rather than compared whole, because `navigator.language` is a
+ * BCP 47 tag: `es`, `es-AR` and `es-419` are all the same bucket here, and a
+ * user in Argentina should not land in English over a region subtag. Lowercased
+ * first — the tag's case is not guaranteed by the spec, only conventional.
+ */
+function detectLocale(): Locale {
+  return navigator.language.toLowerCase().startsWith('es') ? 'es' : 'en'
+}
+
+/**
+ * Reads the OS colour preference once.
+ *
+ * Guarded because `matchMedia` is not universal: jsdom omits it entirely, and
+ * this function runs at module scope wherever a store declares its initial
+ * state — an unguarded call would take down the whole test suite, not one
+ * assertion. Light is the safe answer: it is what the app looked like before
+ * dark mode existed.
+ */
+function detectTheme(): Theme {
+  if (typeof window.matchMedia !== 'function') {
+    return 'light'
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+/**
+ * First-run chrome, detected from the browser exactly once.
+ *
+ * "Once" is enforced by where this sits rather than by a flag: it is only ever
+ * reached as the fallback for an absent or unusable saved value, so the moment
+ * a choice is persisted, detection stops happening. That is what makes a manual
+ * override in Settings survive a reload, and what keeps a later OS theme change
+ * from silently overruling it.
+ */
+export function createDefaultPreferences(): AppPreferences {
+  return { locale: detectLocale(), theme: detectTheme() }
 }
