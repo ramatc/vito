@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { MOMENTUM } from '../../domain/progression/momentum'
 import { useHabitStore } from '../../stores/habitStore'
 import { usePreferencesStore } from '../../stores/preferencesStore'
@@ -274,6 +274,111 @@ describe('Settings — reset progress', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Everything is back to day one.')).toBeInTheDocument()
+    })
+  })
+})
+
+/**
+ * The two controls the whole change exists for, driven the way a user reaches
+ * them: navigate to Settings and click.
+ *
+ * These are the spec's "User switches language in Settings" and "User toggles
+ * theme" scenarios end to end — the click has to move the store, repaint the
+ * app, dress `<html>` and reach storage, and the last one is what makes the
+ * "reload does not re-run detection" requirement true.
+ */
+describe('Settings — language and theme', () => {
+  const html = document.documentElement
+
+  afterEach(() => {
+    html.className = ''
+    html.removeAttribute('lang')
+  })
+
+  it('switches the whole app into Spanish and writes the choice down', async () => {
+    const fake = await boot()
+    render(<App />)
+
+    await goTo('Settings')
+    await userEvent.click(screen.getByRole('button', { name: 'Español' }))
+
+    expect(screen.getAllByRole('link', { name: 'Ajustes' })).toHaveLength(2)
+    expect(screen.getByRole('heading', { name: 'Idioma' })).toBeInTheDocument()
+    expect(html.lang).toBe('es')
+    await waitFor(() => {
+      expect(fake.data.preferences.locale).toBe('es')
+    })
+  })
+
+  it('switches back to English from the Spanish labels', async () => {
+    const fake = await boot({ preferences: { locale: 'es' } })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    render(<App />)
+
+    await goTo('Ajustes')
+    await userEvent.click(screen.getByRole('button', { name: 'English' }))
+
+    expect(screen.getAllByRole('link', { name: 'Settings' })).toHaveLength(2)
+    expect(html.lang).toBe('en-US')
+    await waitFor(() => {
+      expect(fake.data.preferences.locale).toBe('en')
+    })
+  })
+
+  it('marks the active language as the pressed one', async () => {
+    await boot()
+    render(<App />)
+
+    await goTo('Settings')
+
+    expect(screen.getByRole('button', { name: 'English', pressed: true })).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Español', pressed: false })).toBeVisible()
+  })
+
+  it('turns the lights out and writes that down too', async () => {
+    const fake = await boot()
+    render(<App />)
+
+    await goTo('Settings')
+    await userEvent.click(screen.getByRole('button', { name: 'Dark' }))
+
+    expect(html.classList.contains('dark')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Dark', pressed: true })).toBeVisible()
+    await waitFor(() => {
+      expect(fake.data.preferences.theme).toBe('dark')
+    })
+  })
+
+  it('turns them back on again', async () => {
+    const fake = await boot({ preferences: { theme: 'dark' } })
+    usePreferencesStore.setState({ preferences: { locale: 'en', theme: 'dark' } })
+    render(<App />)
+
+    await goTo('Settings')
+    await userEvent.click(screen.getByRole('button', { name: 'Light' }))
+
+    expect(html.classList.contains('dark')).toBe(false)
+    await waitFor(() => {
+      expect(fake.data.preferences.theme).toBe('light')
+    })
+  })
+
+  /**
+   * Two controls, one persisted pair. Changing the language must not quietly
+   * put the theme back to whatever it was detected as.
+   */
+  it('keeps the theme when the language moves', async () => {
+    const fake = await boot()
+    render(<App />)
+
+    await goTo('Settings')
+    await userEvent.click(screen.getByRole('button', { name: 'Dark' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Español' }))
+
+    expect(html.classList.contains('dark')).toBe(true)
+    expect(screen.getByRole('button', { name: 'Oscuro', pressed: true })).toBeVisible()
+    await waitFor(() => {
+      expect(fake.data.preferences).toEqual({ locale: 'es', theme: 'dark' })
     })
   })
 })
