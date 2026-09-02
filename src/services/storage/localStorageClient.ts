@@ -27,10 +27,26 @@ export const STORAGE_KEYS = {
   completions: 'vito:v1:completions',
   progress: 'vito:v1:progress',
   vito: 'vito:v1:vito',
+  preferences: 'vito:v1:preferences',
   schema: 'vito:v1:schema',
 } as const
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS]
+
+/**
+ * Keys `resetAll` deliberately spares.
+ *
+ * Language and theme are chrome, not progress: "start over" offered to clear
+ * the habits and everything Vito earned, and clearing them is all it should do.
+ * Wiping the language would drop someone back into a tongue they may not read,
+ * from a button that never mentioned it.
+ *
+ * Written as a named exemption rather than by leaving `preferences` out of
+ * `STORAGE_KEYS`, because that inventory is also what guarantees the app only
+ * ever touches keys it owns. A key must be listed there to be owned, and listed
+ * here to be spared — two separate facts, kept separate.
+ */
+const RESET_PRESERVED_KEYS: readonly StorageKey[] = [STORAGE_KEYS.preferences]
 
 export interface StorageFailure {
   operation: 'read' | 'write' | 'remove' | 'schema'
@@ -155,9 +171,16 @@ export function remove(key: StorageKey): void {
   }
 }
 
-/** Clears every key in `STORAGE_KEYS` and re-stamps the current schema version. */
+/**
+ * Clears every key in `STORAGE_KEYS` except the preserved ones, then re-stamps
+ * the current schema version.
+ */
 export function clearAll(): void {
   for (const key of Object.values(STORAGE_KEYS)) {
+    if (RESET_PRESERVED_KEYS.includes(key)) {
+      continue
+    }
+
     remove(key)
   }
 

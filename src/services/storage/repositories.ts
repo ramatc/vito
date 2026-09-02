@@ -1,4 +1,5 @@
 import type {
+  AppPreferences,
   DateKey,
   Habit,
   HabitCompletion,
@@ -7,6 +8,7 @@ import type {
 } from '../../types/models'
 import { createLocalCompletionRepository } from './localCompletionRepository'
 import { createLocalHabitRepository } from './localHabitRepository'
+import { createLocalPreferencesRepository } from './localPreferencesRepository'
 import { createLocalProgressRepository } from './localProgressRepository'
 import { createLocalVitoRepository } from './localVitoRepository'
 import { clearAll, ensureSchemaVersion } from './localStorageClient'
@@ -55,7 +57,17 @@ export interface VitoRepository {
 }
 
 /**
- * Four aggregates, not three. Completions are split out from habits because
+ * Chrome, not progress. Its own aggregate rather than a corner of `VitoState`
+ * precisely so that `resetAll` can spare it without needing to know how to
+ * partially rebuild another aggregate.
+ */
+export interface PreferencesRepository {
+  get(): Promise<AppPreferences>
+  save(preferences: AppPreferences): Promise<void>
+}
+
+/**
+ * Five aggregates, not three. Completions are split out from habits because
  * they are an append-only log read by date range — a different access pattern
  * and, in any future backend, a different table. Nesting them under
  * `HabitRepository` would force that backend to fake a collection.
@@ -65,7 +77,11 @@ export interface Repositories {
   completions: CompletionRepository
   progress: ProgressRepository
   vito: VitoRepository
-  /** Backs Settings > Reset Progress. Clears every key the app owns. */
+  preferences: PreferencesRepository
+  /**
+   * Backs Settings > Reset Progress. Clears every key the app owns except the
+   * preferences, which the button never offered to change.
+   */
   resetAll(): Promise<void>
 }
 
@@ -77,6 +93,7 @@ export function createRepositories(): Repositories {
     completions: createLocalCompletionRepository(),
     progress: createLocalProgressRepository(),
     vito: createLocalVitoRepository(),
+    preferences: createLocalPreferencesRepository(),
     resetAll: async () => {
       clearAll()
     },
