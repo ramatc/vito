@@ -1,7 +1,68 @@
 @import 'tailwindcss';
 
+/*
+ * Dark mode is a class on `<html>`, not a media query.
+ *
+ * `prefers-color-scheme` only ever answers what the OS wants, and the app has to
+ * honour a choice made in Settings that may contradict it. A class is something
+ * the app can set; `app/documentPreferences.ts` is its only writer.
+ *
+ * `:where()` keeps the variant at zero specificity, so `dark:` utilities sort by
+ * source order like every other Tailwind variant instead of quietly outranking
+ * whatever they are paired with.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+/*
+ * Five seeded colours, not a palette rewrite.
+ *
+ * The screens are painted in Tailwind's slate and emerald scales and stay that
+ * way; these exist for the handful of surfaces that have to flip wholesale, and
+ * everything else pairs an explicit `dark:` utility instead. A full token layer
+ * would have meant touching every file in the app to gain a rename.
+ *
+ * `color-scheme` is what makes the parts the app does not paint follow along —
+ * scrollbars, form controls, the space behind an over-scroll.
+ */
+:root {
+  color-scheme: light;
+
+  --surface: #f8fafc;
+  --surface-raised: #ffffff;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --brand: #059669;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --surface: #0f172a;
+  --surface-raised: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-muted: #94a3b8;
+  --brand: #34d399;
+}
+
+/*
+ * `inline` is the load-bearing word.
+ *
+ * Without it Tailwind resolves a theme value when it builds the stylesheet, and
+ * these five would freeze at whatever `:root` said — the `.dark` block would
+ * change the custom properties and nothing on screen would move. `inline`
+ * substitutes the `var()` into the utility itself, so the lookup happens in the
+ * browser, at the element, under whichever block is currently winning.
+ */
+@theme inline {
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+  --color-brand: var(--brand);
 }
 
 html,

@@ -12,6 +12,7 @@ import { getRepositories, setRepositories } from '../stores/repositories'
 import { useUiStore } from '../stores/uiStore'
 import { useVitoStore } from '../stores/vitoStore'
 import type { DateKey } from '../types/models'
+import { applyDocumentPreferences } from './documentPreferences'
 
 /**
  * The composition root: the one place that knows both which repositories exist
@@ -111,6 +112,13 @@ export async function bootstrap(): Promise<void> {
   })
 
   await hydrateStores()
+
+  // Immediately after hydration and deliberately before the rollover: `main.tsx`
+  // renders in this promise's `finally`, so everything applied here lands before
+  // React's first paint and someone who chose dark never sees a white frame.
+  // Ordering it ahead of the rollover means even a failure down there leaves the
+  // app looking the way it was left.
+  applyDocumentPreferences(usePreferencesStore.getState().preferences)
 
   await runDayRollover()
 }

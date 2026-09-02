@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { COMEBACK } from '../../domain/progression/comeback'
 import { MOMENTUM } from '../../domain/progression/momentum'
+import { createRepositories } from '../../services/storage/repositories'
 import { useHabitStore } from '../../stores/habitStore'
 import { usePreferencesStore } from '../../stores/preferencesStore'
 import { useProgressStore } from '../../stores/progressStore'
@@ -10,7 +11,7 @@ import { useVitoStore } from '../../stores/vitoStore'
 import type { FakeSeed } from '../../test/fakeRepositories'
 import { createFakeRepositories } from '../../test/fakeRepositories'
 import type { Habit } from '../../types/models'
-import { resetAllData, runDayRollover } from '../bootstrap'
+import { bootstrap, resetAllData, runDayRollover } from '../bootstrap'
 
 /**
  * The rollover is the one piece of app logic that runs without a user action,
@@ -52,6 +53,53 @@ const progressNow = () => useProgressStore.getState().progress
 beforeEach(() => {
   setRepositories(createFakeRepositories().repos)
   useUiStore.setState({ reaction: null })
+})
+
+/**
+ * The dark theme has to be on the document before React ever paints. `main.tsx`
+ * renders in `bootstrap()`'s `finally`, so anything this function applies lands
+ * ahead of the first frame — which is the whole reason the app needs no inline
+ * script in `index.html` and no flash of the wrong theme.
+ *
+ * These cases go through the real repositories on purpose: reading the saved
+ * value back is the behaviour under test, and a fake would only prove that
+ * `bootstrap` calls something.
+ */
+describe('bootstrap — the document before the first paint', () => {
+  const html = document.documentElement
+
+  afterEach(() => {
+    html.className = ''
+    html.removeAttribute('lang')
+    setRepositories(createFakeRepositories().repos)
+  })
+
+  it('wears the saved theme and language, not the browser-detected ones', async () => {
+    // jsdom reports en-US and has no matchMedia, so detection would answer
+    // English and light. Anything else here came off the saved value.
+    await createRepositories().preferences.save({ locale: 'es', theme: 'dark' })
+
+    await bootstrap()
+
+    expect(html.classList.contains('dark')).toBe(true)
+    expect(html.lang).toBe('es')
+  })
+
+  it('leaves the document light when that is what was saved', async () => {
+    html.classList.add('dark')
+    await createRepositories().preferences.save({ locale: 'en', theme: 'light' })
+
+    await bootstrap()
+
+    expect(html.classList.contains('dark')).toBe(false)
+    expect(html.lang).toBe('en-US')
+  })
+
+  it('still publishes a language on a first run with nothing saved', async () => {
+    await bootstrap()
+
+    expect(html.lang).toBe('en-US')
+  })
 })
 
 describe('runDayRollover — idempotence', () => {
