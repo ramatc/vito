@@ -1,16 +1,29 @@
 import { NavLink } from 'react-router-dom'
 import { cn } from '../../utils/cn'
+import type { NavLabelKey } from './navItems'
 import { NAV_ITEMS } from './navItems'
 
 /**
  * The mobile navigation. Real routes rather than a tab index in a store: on
  * Android the system back gesture must return to the previous tab instead of
  * closing the app, and only history gives that for free.
+ *
+ * Both label props come from `AppShell` rather than from a lookup here: this
+ * bar and the sidebar render the same four words, and resolving them twice is
+ * how the two navigations start disagreeing.
  */
-export function BottomTabBar({ className }: { className?: string }) {
+
+export interface BottomTabBarProps {
+  navLabels: Record<NavLabelKey, string>
+  /** Accessible name for the landmark itself. */
+  navLabel: string
+  className?: string
+}
+
+export function BottomTabBar({ navLabels, navLabel, className }: BottomTabBarProps) {
   return (
     <nav
-      aria-label="Primary"
+      aria-label={navLabel}
       className={cn(
         'fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur',
         'pb-[env(safe-area-inset-bottom)]',
@@ -31,7 +44,7 @@ export function BottomTabBar({ className }: { className?: string }) {
               }
             >
               <item.Icon className="size-5" />
-              {item.label}
+              {navLabels[item.labelKey]}
             </NavLink>
           </li>
         ))}
