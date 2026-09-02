@@ -6,6 +6,7 @@ import {
   setStorageErrorHandler,
 } from '../services/storage/repositories'
 import { useHabitStore } from '../stores/habitStore'
+import { usePreferencesStore } from '../stores/preferencesStore'
 import { useProgressStore } from '../stores/progressStore'
 import { getRepositories, setRepositories } from '../stores/repositories'
 import { useUiStore } from '../stores/uiStore'
@@ -19,15 +20,20 @@ import type { DateKey } from '../types/models'
  */
 
 /**
- * Fills all three persisted stores from whatever the repositories currently
+ * Fills all four persisted stores from whatever the repositories currently
  * hold. One list, used by startup and by a reset, so a fifth store cannot be
  * added to one path and forgotten in the other.
+ *
+ * Preferences are on this list even though a reset does not clear them: reading
+ * them back is what proves the exemption held, and skipping the read would
+ * leave the in-memory copy trusted rather than verified.
  */
 async function hydrateStores(): Promise<void> {
   await Promise.all([
     useHabitStore.getState().load(),
     useProgressStore.getState().load(),
     useVitoStore.getState().load(),
+    usePreferencesStore.getState().load(),
   ])
 }
 

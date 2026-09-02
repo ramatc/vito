@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { COMEBACK } from '../../domain/progression/comeback'
 import { MOMENTUM } from '../../domain/progression/momentum'
 import { useHabitStore } from '../../stores/habitStore'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import { useProgressStore } from '../../stores/progressStore'
 import { setRepositories } from '../../stores/repositories'
 import { useUiStore } from '../../stores/uiStore'
@@ -40,6 +41,7 @@ async function boot(seed: FakeSeed = {}) {
     useHabitStore.getState().load(),
     useProgressStore.getState().load(),
     useVitoStore.getState().load(),
+    usePreferencesStore.getState().load(),
   ])
 
   return fake
@@ -296,6 +298,7 @@ describe('resetAllData', () => {
         equippedItems: { hat: 'hat-sprout' },
         unlockedItemIds: ['hat-sprout'],
       },
+      preferences: { locale: 'es', theme: 'dark' },
     })
 
   it('clears every stored aggregate', async () => {
@@ -333,5 +336,49 @@ describe('resetAllData', () => {
     expect(useHabitStore.getState().status).toBe('ready')
     expect(useProgressStore.getState().status).toBe('ready')
     expect(useVitoStore.getState().status).toBe('ready')
+    expect(usePreferencesStore.getState().status).toBe('ready')
+  })
+
+  /**
+   * Hydration is one list used by both startup and reset, which is what stops a
+   * store being added to one path and forgotten in the other. This pins that
+   * preferences are on that list: seeded into storage, deliberately stale in
+   * memory, and correct again afterwards.
+   */
+  it('hydrates the language and theme alongside the other aggregates', async () => {
+    setRepositories(
+      createFakeRepositories({ preferences: { locale: 'es', theme: 'dark' } }).repos,
+    )
+    usePreferencesStore.setState({
+      preferences: { locale: 'en', theme: 'light' },
+      status: 'idle',
+    })
+
+    await resetAllData()
+
+    expect(usePreferencesStore.getState().preferences).toEqual({
+      locale: 'es',
+      theme: 'dark',
+    })
+  })
+
+  /**
+   * The one thing reset must NOT do. Starting over is about habits and what
+   * Vito earned; it never offered to change the language, and someone who set
+   * Spanish should not have to find the setting again in English.
+   */
+  it('leaves the language and theme exactly as the user set them', async () => {
+    const fake = await seeded()
+    await usePreferencesStore.getState().setLocale('es')
+    await usePreferencesStore.getState().setTheme('dark')
+
+    await resetAllData()
+
+    expect(usePreferencesStore.getState().preferences).toEqual({
+      locale: 'es',
+      theme: 'dark',
+    })
+    expect(fake.data.preferences).toEqual({ locale: 'es', theme: 'dark' })
+    expect(fake.data.habits).toEqual([])
   })
 })
