@@ -80,6 +80,38 @@
       }
     },
     {
+      "files": ["src/i18n/*"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!./*", "!../types/*"],
+                "message": "i18n/ is a leaf ring one step above types/: dictionaries and a pure t(). It may import only src/types/** and its own siblings. No React, no stores, no services — a translation that needs those is not a translation, it is a container reading the locale and calling t() itself."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/i18n/__tests__/*.test.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["*", "**", "!../*", "!../../types/*", "!vitest"],
+                "message": "An i18n test may import exactly what the module under test may import, plus the bare `vitest` specifier. No Testing Library — nothing in this ring renders."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/services/storage/*"],
       "rules": {
         "no-restricted-imports": [

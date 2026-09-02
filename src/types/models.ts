@@ -100,6 +100,26 @@ export interface VitoState {
   unlockedItemIds: string[]
 }
 
+/**
+ * The two language buckets the app ships. Deliberately a bucket and not a BCP 47
+ * tag: this project's Spanish is Rioplatense, so `es-ES` would be actively
+ * wrong, and regional precision is a *formatting* concern that belongs to
+ * `Intl`, not to a dictionary lookup.
+ */
+export type Locale = 'en' | 'es'
+
+export type Theme = 'light' | 'dark'
+
+/**
+ * Chrome-level choices, persisted apart from progress on purpose: resetting
+ * progress puts Vito back at day one, it does not put the app back into a
+ * language the user does not read.
+ */
+export interface AppPreferences {
+  locale: Locale
+  theme: Theme
+}
+
 export interface CosmeticItem {
   id: string
   name: string
