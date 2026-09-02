@@ -122,6 +122,8 @@ export function HabitsScreen() {
             : `"${archiving.name}" moves out of your list from today on. Everything it has already earned stays exactly as it is.`
         }
         confirmLabel="Archive"
+        cancelLabel="Cancel"
+        closeLabel="Close"
         onConfirm={confirmArchive}
         onCancel={() => {
           setArchiving(undefined)
