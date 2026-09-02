@@ -338,6 +338,7 @@
                   "!../*/*",
                   "!../../components/*/*",
                   "!../../hooks/*",
+                  "!../../i18n/*",
                   "!../../stores/*",
                   "!../../domain/*/*",
                   "!../../types/*",
@@ -348,7 +349,7 @@
                   "!framer-motion",
                   "!lucide-react"
                 ],
-                "message": "features/ composes the UI: it may import React, the router, motion and icon libraries, components/, hooks/, stores/, domain/, types/ and utils/. No services/storage — persistence is reached through a store, never directly."
+                "message": "features/ composes the UI: it may import React, the router, motion and icon libraries, components/, hooks/, stores/, domain/, i18n/, types/ and utils/. No services/storage — persistence is reached through a store, never directly."
               }
             ]
           }
