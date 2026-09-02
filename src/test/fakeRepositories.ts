@@ -1,9 +1,16 @@
 import {
+  createDefaultPreferences,
   createDefaultUserProgress,
   createDefaultVitoState,
 } from '../services/storage/defaults'
 import type { Repositories } from '../services/storage/repositories'
-import type { Habit, HabitCompletion, UserProgress, VitoState } from '../types/models'
+import type {
+  AppPreferences,
+  Habit,
+  HabitCompletion,
+  UserProgress,
+  VitoState,
+} from '../types/models'
 
 /**
  * An in-memory `Repositories`, for tests that exercise the real stores.
@@ -18,6 +25,7 @@ export interface FakeSeed {
   completions?: HabitCompletion[]
   progress?: Partial<UserProgress>
   vito?: Partial<VitoState>
+  preferences?: Partial<AppPreferences>
 }
 
 export interface FakeRepositories {
@@ -27,6 +35,7 @@ export interface FakeRepositories {
     completions: HabitCompletion[]
     progress: UserProgress
     vito: VitoState
+    preferences: AppPreferences
   }
 }
 
@@ -36,6 +45,7 @@ export function createFakeRepositories(seed: FakeSeed = {}): FakeRepositories {
     completions: seed.completions ?? [],
     progress: { ...createDefaultUserProgress(), ...seed.progress },
     vito: { ...createDefaultVitoState(), ...seed.vito },
+    preferences: { ...createDefaultPreferences(), ...seed.preferences },
   }
 
   const repos: Repositories = {
@@ -83,11 +93,20 @@ export function createFakeRepositories(seed: FakeSeed = {}): FakeRepositories {
         data.vito = { ...vito }
       },
     },
+    preferences: {
+      get: async () => ({ ...data.preferences }),
+      save: async (preferences) => {
+        data.preferences = { ...preferences }
+      },
+    },
     resetAll: async () => {
       data.habits = []
       data.completions = []
       data.progress = createDefaultUserProgress()
       data.vito = createDefaultVitoState()
+      // `preferences` is absent on purpose, mirroring RESET_PRESERVED_KEYS in
+      // localStorageClient. A fake that wiped them would let a regression in
+      // the real reset pass its own test.
     },
   }
 
