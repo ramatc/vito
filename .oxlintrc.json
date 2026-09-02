@@ -218,12 +218,13 @@
                   "!./*",
                   "!../types/*",
                   "!../domain/*/*",
+                  "!../i18n/*",
                   "!../stores/*",
                   "!../utils/*",
                   "!react",
                   "!framer-motion"
                 ],
-                "message": "hooks/ is the derivation ring: it may import React, framer-motion's hooks, src/stores/**, src/domain/**, src/types/** and src/utils/**. No components/ or features/ — a hook that renders is a component, and motion CONFIGS still live only in features/vito/animation/."
+                "message": "hooks/ is the derivation ring: it may import React, framer-motion's hooks, src/stores/**, src/domain/**, src/i18n/**, src/types/** and src/utils/**. No components/ or features/ — a hook that renders is a component, and motion CONFIGS still live only in features/vito/animation/."
               }
             ]
           }
@@ -244,6 +245,7 @@
                   "!../*",
                   "!../../types/*",
                   "!../../domain/*/*",
+                  "!../../i18n/*",
                   "!../../stores/*",
                   "!../../utils/*",
                   "!../../test/*",
