@@ -31,6 +31,10 @@ export function ResetProgressDialog({
       message="This clears your habits, your completion history, and everything Vito has earned and unlocked. There is no copy anywhere else, so it cannot be brought back."
       confirmLabel="Start over"
       cancelLabel="Keep my progress"
+      // Deliberately not "Keep my progress" again: the header's close control
+      // and the cancel button do the same thing, but two on-screen controls
+      // sharing one accessible name is worse than one extra string.
+      closeLabel="Close"
       tone="danger"
       onConfirm={onConfirm}
       onCancel={onCancel}

@@ -61,7 +61,16 @@ function App() {
         <ErrorBoundary>
           <AppRoutes />
         </ErrorBoundary>
-        <Toaster toasts={toasts} onDismiss={dismissToast} />
+        {/*
+          Still a literal: `Toaster` handed its copy back to its caller, and the
+          app ring's own strings are swept in a later slice. The string is the
+          one the component used to embed, so nothing on screen moved.
+        */}
+        <Toaster
+          toasts={toasts}
+          dismissLabel="Dismiss message"
+          onDismiss={dismissToast}
+        />
       </BrowserRouter>
     </AppProviders>
   )

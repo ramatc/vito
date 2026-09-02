@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MOMENTUM } from '../../domain/progression/momentum'
 import { useHabitStore } from '../../stores/habitStore'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import { useProgressStore } from '../../stores/progressStore'
 import { setRepositories } from '../../stores/repositories'
 import { useUiStore } from '../../stores/uiStore'
@@ -53,7 +54,74 @@ async function goTo(label: string) {
 
 beforeEach(() => {
   useUiStore.setState({ reaction: null, toasts: [], storageError: null })
+  // Explicit rather than inherited: the language cases below write to this
+  // store, and every English assertion in this file would otherwise depend on
+  // which test ran last.
+  usePreferencesStore.setState({ preferences: { locale: 'en', theme: 'light' } })
   window.history.pushState({}, '', '/')
+})
+
+/**
+ * The layout ring is props-only, so the shell cannot look a string up: labels
+ * are resolved in `app/` and handed down. What is worth pinning is the part a
+ * type cannot — that the resolution is a live subscription, so switching the
+ * language repaints the chrome instead of waiting for a reload.
+ */
+describe('the app shell in the active language', () => {
+  it('names the navigation, the wordmark and the tabs in Spanish', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    const sidebar = screen.getByRole('navigation', { name: 'Barra lateral principal' })
+    expect(within(sidebar).getByText('Vito')).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Principal' })).toBeInTheDocument()
+
+    for (const label of ['Hoy', 'Hábitos', 'Ropero', 'Ajustes']) {
+      expect(screen.getAllByRole('link', { name: label })).toHaveLength(2)
+    }
+  })
+
+  it('names them in English too, from the same one source', async () => {
+    await boot()
+
+    render(<App />)
+
+    expect(
+      screen.getByRole('navigation', { name: 'Primary sidebar' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: 'Primary' })).toBeInTheDocument()
+
+    for (const label of ['Today', 'Habits', 'Closet', 'Settings']) {
+      expect(screen.getAllByRole('link', { name: label })).toHaveLength(2)
+    }
+  })
+
+  it('writes Home in the active language as well', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(screen.getByRole('heading', { name: 'Hoy', level: 1 })).toBeInTheDocument()
+    expect(screen.getByText('De a uno. Vito crece con cada uno.')).toBeInTheDocument()
+  })
+
+  it('repaints the whole shell when the language changes mid-session', async () => {
+    await boot()
+    render(<App />)
+
+    expect(screen.getAllByRole('link', { name: 'Closet' })).toHaveLength(2)
+
+    await act(async () => {
+      await usePreferencesStore.getState().setLocale('es')
+    })
+
+    expect(screen.getAllByRole('link', { name: 'Ropero' })).toHaveLength(2)
+    expect(screen.queryByRole('link', { name: 'Closet' })).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Hoy', level: 1 })).toBeInTheDocument()
+  })
 })
 
 describe('Closet', () => {

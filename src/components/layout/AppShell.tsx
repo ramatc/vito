@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { cn } from '../../utils/cn'
 import { BottomTabBar } from './BottomTabBar'
+import type { NavLabelKey } from './navItems'
 import { NAV_ITEMS } from './navItems'
 
 /**
@@ -21,17 +22,36 @@ import { NAV_ITEMS } from './navItems'
  * So do not "fix" this with a static `aria-hidden` on either one: an attribute
  * cannot track a media query, and whichever navigation carried it would be
  * hidden from assistive tech at the width where it is the visible one.
+ *
+ * Every word it renders is a prop. `<Route element={<AppShell />}>` offers no
+ * prop channel, which is exactly why `app/routes.tsx` wraps it: the route reads
+ * the locale and hands the strings down, and this ring stays presentational.
  */
-export function AppShell() {
+
+export interface AppShellProps {
+  navLabels: Record<NavLabelKey, string>
+  wordmark: string
+  /** Accessible name for the desktop navigation landmark. */
+  sidebarNavLabel: string
+  /** Accessible name for the phone navigation landmark. */
+  bottomNavLabel: string
+}
+
+export function AppShell({
+  navLabels,
+  wordmark,
+  sidebarNavLabel,
+  bottomNavLabel,
+}: AppShellProps) {
   return (
     <div className="min-h-svh bg-slate-50 text-slate-900">
       <div className="mx-auto flex w-full max-w-5xl">
         <nav
-          aria-label="Primary sidebar"
+          aria-label={sidebarNavLabel}
           className="sticky top-0 hidden h-svh w-56 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4 md:flex"
         >
           <span className="px-3 pt-2 pb-4 text-lg font-semibold tracking-tight">
-            Vito
+            {wordmark}
           </span>
           {NAV_ITEMS.map((item) => (
             <NavLink
@@ -48,7 +68,7 @@ export function AppShell() {
               }
             >
               <item.Icon className="size-5" />
-              {item.label}
+              {navLabels[item.labelKey]}
             </NavLink>
           ))}
         </nav>
@@ -61,7 +81,11 @@ export function AppShell() {
         </div>
       </div>
 
-      <BottomTabBar className="md:hidden" />
+      <BottomTabBar
+        navLabels={navLabels}
+        navLabel={bottomNavLabel}
+        className="md:hidden"
+      />
     </div>
   )
 }

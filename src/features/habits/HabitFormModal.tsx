@@ -27,6 +27,9 @@ export function HabitFormModal({ open, habit, onSubmit, onClose }: HabitFormModa
           ? undefined
           : 'Changes apply from today on. Past completions keep the XP they earned.'
       }
+      // `Modal` no longer embeds this string, so it arrives from here alongside
+      // the rest of this screen's copy. Extracted with the habits slice.
+      closeLabel="Close"
       onClose={onClose}
     >
       <HabitForm
