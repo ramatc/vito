@@ -124,6 +124,110 @@ describe('the app shell in the active language', () => {
   })
 })
 
+/**
+ * The habits ring, driven the way a user reaches it.
+ *
+ * PR3 taught the chrome to speak; this is the first ring whose own copy moves,
+ * so what is worth pinning is that every layer of it moves together — the
+ * screen, the reference data the form is built from, the card's accessible
+ * names, the schedule line that comes from `Intl` rather than the dictionary,
+ * and the toast a hook pushes long after the render that started it.
+ */
+describe('the habits ring in the active language', () => {
+  it('writes the screen, the card and the schedule in Spanish', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    render(<App />)
+
+    await goTo('Hábitos')
+
+    expect(screen.getByRole('heading', { name: 'Hábitos', level: 1 })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Nuevo' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Editar Read' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Archivar Read' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Completar Read' })).toBeVisible()
+    expect(screen.getByText(/Todos los días/)).toBeInTheDocument()
+  })
+
+  it('writes the same screen in English from the same source', async () => {
+    await boot()
+    render(<App />)
+
+    await goTo('Habits')
+
+    expect(screen.getByRole('heading', { name: 'Habits', level: 1 })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'New' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit Read' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Complete Read' })).toBeVisible()
+    expect(screen.getByText(/Every day/)).toBeInTheDocument()
+  })
+
+  it('invites a first habit in Spanish when there is nothing to list', async () => {
+    await boot({ habits: [] })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    render(<App />)
+
+    await goTo('Hábitos')
+
+    expect(screen.getByText('Todavía no hay hábitos')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Agregá tu primer hábito' }),
+    ).toBeInTheDocument()
+  })
+
+  /**
+   * The form is the densest surface in the ring and the only one whose copy
+   * comes from three different places at once: the dictionary, the category and
+   * icon registries, and `Intl`'s weekday names.
+   */
+  it('writes the form, its categories, its icons and its weekdays in Spanish', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    render(<App />)
+
+    await goTo('Hábitos')
+    await userEvent.click(screen.getByRole('button', { name: 'Nuevo' }))
+
+    expect(
+      screen.getByRole('heading', { name: 'Hábito nuevo', level: 2 }),
+    ).toBeInTheDocument()
+    expect(screen.getByLabelText('Nombre')).toBeInTheDocument()
+    expect(screen.getByLabelText('Categoría')).toHaveValue('Salud')
+    expect(screen.getByRole('radio', { name: 'Destellos' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Fácil, 10 XP' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Agregar hábito' })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Ciertos días' }))
+
+    expect(screen.getByRole('checkbox', { name: 'lunes' })).toBeInTheDocument()
+  })
+
+  it('counts today in Spanish and translates the toast a hook pushes later', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    render(<App />)
+
+    expect(screen.getByText('0 de 1 hechos hoy')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Completar Read' }))
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'Desmarcar Read' }))
+
+    expect(await screen.findByText('Desmarcado por hoy.')).toBeInTheDocument()
+  })
+
+  it('counts today in English and translates that toast too', async () => {
+    await boot()
+    render(<App />)
+
+    expect(screen.getByText('0 of 1 done today')).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Complete Read' }))
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'Uncheck Read' }))
+
+    expect(await screen.findByText('Unchecked for today.')).toBeInTheDocument()
+  })
+})
+
 describe('Closet', () => {
   const partlyEarned: FakeSeed = {
     // The aura needs 2000 XP and stays locked, so the locked branch is real.

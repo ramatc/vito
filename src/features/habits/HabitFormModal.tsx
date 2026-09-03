@@ -1,4 +1,5 @@
 import { Modal } from '../../components/ui/Modal'
+import { useTranslate } from '../../hooks/useTranslate'
 import type { Habit } from '../../types/models'
 import type { HabitDraftValues } from './HabitForm'
 import { HabitForm } from './HabitForm'
@@ -18,18 +19,16 @@ export interface HabitFormModalProps {
 }
 
 export function HabitFormModal({ open, habit, onSubmit, onClose }: HabitFormModalProps) {
+  const t = useTranslate()
+
   return (
     <Modal
       open={open}
-      title={habit === undefined ? 'New habit' : 'Edit habit'}
-      description={
-        habit === undefined
-          ? undefined
-          : 'Changes apply from today on. Past completions keep the XP they earned.'
-      }
+      title={t(habit === undefined ? 'habits.form.newTitle' : 'habits.form.editTitle')}
+      description={habit === undefined ? undefined : t('habits.form.editDescription')}
       // `Modal` no longer embeds this string, so it arrives from here alongside
-      // the rest of this screen's copy. Extracted with the habits slice.
-      closeLabel="Close"
+      // the rest of this screen's copy.
+      closeLabel={t('common.close')}
       onClose={onClose}
     >
       <HabitForm
