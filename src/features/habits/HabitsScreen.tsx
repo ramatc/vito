@@ -4,8 +4,9 @@ import { Screen } from '../../components/layout/Screen'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog'
-import { SAVE_ERROR_MESSAGE, useCompleteHabit } from '../../hooks/useCompleteHabit'
+import { useCompleteHabit } from '../../hooks/useCompleteHabit'
 import { useTodayHabits } from '../../hooks/useTodayHabits'
+import { useTranslate } from '../../hooks/useTranslate'
 import { useHabitStore } from '../../stores/habitStore'
 import { useUiStore } from '../../stores/uiStore'
 import type { Habit } from '../../types/models'
@@ -21,6 +22,7 @@ import { HabitList } from './HabitList'
  * a store, so every component below it stays presentational and testable.
  */
 export function HabitsScreen() {
+  const t = useTranslate()
   const habits = useHabitStore((state) => state.habits)
   const { completedHabitIds, today } = useTodayHabits()
   const { toggle, pendingHabitIds } = useCompleteHabit(today)
@@ -47,7 +49,7 @@ export function HabitsScreen() {
   }
 
   const reportSaveError = () => {
-    useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+    useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
   }
 
   const submitForm = (values: HabitDraftValues) => {
@@ -78,12 +80,12 @@ export function HabitsScreen() {
 
   return (
     <Screen
-      title="Habits"
-      description="Everything you are building. Archived habits keep their history."
+      title={t('habits.title')}
+      description={t('habits.description')}
       action={
         <Button size="sm" onClick={openNew}>
           <Plus className="size-4" />
-          New
+          {t('habits.new')}
         </Button>
       }
     >
@@ -96,11 +98,11 @@ export function HabitsScreen() {
         onArchive={setArchiving}
         empty={
           <Card className="flex flex-col items-start gap-3 text-sm text-slate-600">
-            <span className="font-medium text-slate-900">No habits yet</span>
-            <span>Start with one small thing you can do today.</span>
+            <span className="font-medium text-slate-900">{t('habits.empty.title')}</span>
+            <span>{t('habits.empty.description')}</span>
             <Button size="sm" onClick={openNew}>
               <Plus className="size-4" />
-              Add your first habit
+              {t('habits.empty.action')}
             </Button>
           </Card>
         }
@@ -115,15 +117,15 @@ export function HabitsScreen() {
 
       <ConfirmDialog
         open={archiving !== undefined}
-        title="Archive this habit?"
+        title={t('habits.archive.title')}
         message={
           archiving === undefined
             ? ''
-            : `"${archiving.name}" moves out of your list from today on. Everything it has already earned stays exactly as it is.`
+            : t('habits.archive.message', { name: archiving.name })
         }
-        confirmLabel="Archive"
-        cancelLabel="Cancel"
-        closeLabel="Close"
+        confirmLabel={t('habits.archive.confirm')}
+        cancelLabel={t('common.cancel')}
+        closeLabel={t('common.close')}
         onConfirm={confirmArchive}
         onCancel={() => {
           setArchiving(undefined)

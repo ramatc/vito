@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Card } from '../../components/ui/Card'
 import { useCompleteHabit } from '../../hooks/useCompleteHabit'
 import { useTodayHabits } from '../../hooks/useTodayHabits'
+import { useTranslate } from '../../hooks/useTranslate'
 import { HabitList } from './HabitList'
 
 /**
@@ -15,22 +16,26 @@ export function TodayHabits() {
   const { habits, completedHabitIds, completedCount, scheduledCount, allDone, restDay } =
     useTodayHabits()
   const { toggle, pendingHabitIds } = useCompleteHabit()
+  const t = useTranslate()
 
   const onToggle = (habitId: string) => {
     toggle(habitId, completedHabitIds.includes(habitId))
   }
 
   return (
-    <section className="flex flex-col gap-3" aria-label="Today's habits">
+    <section className="flex flex-col gap-3" aria-label={t('habits.today.label')}>
       {scheduledCount > 0 && (
         <p className="text-sm text-slate-500">
-          {completedCount} of {scheduledCount} done today
+          {t('habits.today.progress', {
+            completed: completedCount,
+            scheduled: scheduledCount,
+          })}
         </p>
       )}
 
       {allDone && (
         <Card className="bg-emerald-50 text-sm text-emerald-800 ring-emerald-200">
-          That is everything for today. Vito is delighted.
+          {t('habits.today.allDone')}
         </Card>
       )}
 
@@ -44,21 +49,23 @@ export function TodayHabits() {
             {restDay ? (
               <>
                 <span className="font-medium text-slate-900">
-                  Nothing scheduled today
+                  {t('habits.today.restTitle')}
                 </span>
-                <span>Vito is taking it easy. Ready whenever you are.</span>
+                <span>{t('habits.today.restDescription')}</span>
               </>
             ) : (
               <>
-                <span className="font-medium text-slate-900">No habits yet</span>
-                <span>Add your first one and Vito will start growing with you.</span>
+                <span className="font-medium text-slate-900">
+                  {t('habits.empty.title')}
+                </span>
+                <span>{t('habits.today.emptyDescription')}</span>
               </>
             )}
             <Link
               to="/habits"
               className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 hover:text-emerald-800"
             >
-              Go to habits
+              {t('habits.today.goToHabits')}
             </Link>
           </Card>
         }
