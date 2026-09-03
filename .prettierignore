@@ -8,3 +8,9 @@ package-lock.json
 
 # Local editor-tooling cache, git-excluded but still on disk for the formatter.
 .impeccable
+
+# Planning artifacts written by the spec-driven workflow. They are prose with
+# deliberate line breaks and hand-built tables; reflowing them would rewrite
+# documents this repo's source does not own, and their presence on disk would
+# otherwise fail `format:check` for everyone.
+openspec
