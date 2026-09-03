@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Screen } from '../../components/layout/Screen'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
-import { SAVE_ERROR_MESSAGE } from '../../hooks/useCompleteHabit'
 import { useTranslate } from '../../hooks/useTranslate'
 import { useUiStore } from '../../stores/uiStore'
 import { LanguageToggle } from './LanguageToggle'
@@ -41,7 +40,7 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
           .pushToast({ message: 'Everything is back to day one.', tone: 'info' })
       })
       .catch(() => {
-        useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+        useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
       })
       .finally(() => {
         setResetting(false)

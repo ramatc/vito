@@ -5,9 +5,7 @@ import { useHabitStore } from '../stores/habitStore'
 import type { ReactionType } from '../stores/uiStore'
 import { useUiStore } from '../stores/uiStore'
 import type { DateKey } from '../types/models'
-
-/** Shown when a store action rejects for real — never for the documented no-op. */
-export const SAVE_ERROR_MESSAGE = "Couldn't save that, try again."
+import { useTranslate } from './useTranslate'
 
 /**
  * Turns a completion into what the user sees.
@@ -16,6 +14,8 @@ export const SAVE_ERROR_MESSAGE = "Couldn't save that, try again."
  * animation name. This hook is where that plain data becomes a reaction and a
  * message, which is what keeps the whole game engine testable without a UI.
  */
+
+type Translate = ReturnType<typeof useTranslate>
 
 /** One reaction per completion, most significant event first. */
 function reactionFor(outcome: CompletionOutcome): ReactionType {
@@ -30,19 +30,23 @@ function reactionFor(outcome: CompletionOutcome): ReactionType {
   return 'celebrate'
 }
 
-function messageFor(outcome: CompletionOutcome): string {
-  const xp = `+${String(outcome.xpGained)} XP`
+/**
+ * Still pure: the translator arrives as an argument rather than being reached
+ * for, so which message an outcome earns stays a function of the outcome alone.
+ */
+function messageFor(t: Translate, outcome: CompletionOutcome): string {
+  const xp = t('common.xpGain', { count: outcome.xpGained })
 
   if (outcome.leveledUp) {
-    return `${xp} — level ${String(outcome.newLevel)}! Vito is growing.`
+    return t('habits.toast.levelUp', { xp, level: outcome.newLevel })
   }
 
   if (outcome.unlockedItemIds.length > 0) {
-    return `${xp} — something new is waiting in the closet.`
+    return t('habits.toast.unlock', { xp })
   }
 
   if (outcome.boosted) {
-    return `${xp} — welcome back bonus.`
+    return t('habits.toast.comeback', { xp })
   }
 
   return xp
@@ -67,6 +71,8 @@ export interface CompleteHabitActions {
 }
 
 export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActions {
+  const t = useTranslate()
+
   // Local, not the store: this is UI-only "is the round trip in flight"
   // state for disabling a control, not something any other reader needs.
   const [pending, setPending] = useState<ReadonlySet<string>>(() => new Set())
@@ -101,18 +107,18 @@ export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActi
 
         const ui = useUiStore.getState()
         ui.emitReaction(reactionFor(outcome))
-        ui.pushToast({ message: messageFor(outcome), tone: 'celebrate' })
+        ui.pushToast({ message: messageFor(t, outcome), tone: 'celebrate' })
 
         return outcome
       } catch {
-        useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+        useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
 
         return null
       } finally {
         clearPending(habitId)
       }
     },
-    [today, markPending, clearPending],
+    [today, t, markPending, clearPending],
   )
 
   const undo = useCallback(
@@ -121,14 +127,14 @@ export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActi
 
       try {
         await useHabitStore.getState().undoCompletion(habitId, today)
-        useUiStore.getState().pushToast({ message: 'Unchecked for today.', tone: 'info' })
+        useUiStore.getState().pushToast({ message: t('habits.toast.undo'), tone: 'info' })
       } catch {
-        useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+        useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
       } finally {
         clearPending(habitId)
       }
     },
-    [today, markPending, clearPending],
+    [today, t, markPending, clearPending],
   )
 
   const toggle = useCallback(

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Screen } from '../../components/layout/Screen'
 import { Card } from '../../components/ui/Card'
 import { COSMETIC_CATALOG } from '../../domain/vito/cosmeticCatalog'
-import { SAVE_ERROR_MESSAGE } from '../../hooks/useCompleteHabit'
+import { useTranslate } from '../../hooks/useTranslate'
 import { useVito } from '../../hooks/useVito'
 import { useUiStore } from '../../stores/uiStore'
 import { useVitoStore } from '../../stores/vitoStore'
@@ -36,13 +36,17 @@ function wornSummary(equippedItems: EquippedItems): string {
 }
 
 export function ClosetScreen() {
+  // The rest of this screen's copy is still English literals — PR5 sweeps them.
+  // This one moved early because the constant it used to read lived in a hook
+  // the habits slice owns, and that hook now speaks the active language.
+  const t = useTranslate()
   const { equippedItems, unlockedItemIds } = useVito()
   const [slot, setSlot] = useState<CosmeticSlot>('hat')
 
   const items = COSMETIC_CATALOG.filter((item) => item.slot === slot)
 
   const reportSaveError = () => {
-    useUiStore.getState().pushToast({ message: SAVE_ERROR_MESSAGE, tone: 'info' })
+    useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
   }
 
   const equip = (itemId: string) => {
