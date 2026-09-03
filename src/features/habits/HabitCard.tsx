@@ -2,23 +2,18 @@ import { createElement } from 'react'
 import { Archive, Check, Pencil } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
 import { XP_BY_DIFFICULTY } from '../../domain/habit/xpReward'
+import { useTranslate } from '../../hooks/useTranslate'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import type { Habit } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { describeFrequency } from './frequency'
 import { resolveHabitIcon } from './habitIcons'
 
 /**
- * One habit, as a row. Presentational: it reports taps and knows nothing about
- * stores, XP or what completing actually does.
+ * One habit, as a row. It reports taps and knows nothing about XP rules or what
+ * completing actually does — the only state it reads is the active locale, which
+ * `features/` is the ring that owns.
  */
-
-// Derived from the single source of truth rather than inlined: XP_BY_DIFFICULTY's
-// own comment says no call site may hardcode these numbers.
-const XP_HINT: Record<Habit['difficulty'], string> = {
-  easy: `${String(XP_BY_DIFFICULTY.easy)} XP`,
-  normal: `${String(XP_BY_DIFFICULTY.normal)} XP`,
-  hard: `${String(XP_BY_DIFFICULTY.hard)} XP`,
-}
 
 export interface HabitCardProps {
   habit: Habit
@@ -37,6 +32,13 @@ export function HabitCard({
   onArchive,
   disabled = false,
 }: HabitCardProps) {
+  const t = useTranslate()
+  const locale = usePreferencesStore((state) => state.preferences.locale)
+
+  // XP derived from the single source of truth rather than inlined:
+  // XP_BY_DIFFICULTY's own comment says no call site may hardcode these numbers.
+  const xpHint = t('common.xp', { count: XP_BY_DIFFICULTY[habit.difficulty] })
+
   // `createElement` rather than `const Icon = ...; <Icon />`: the lookup returns
   // a stable reference from a module-level registry, but a capitalised local
   // reads to both a linter and a reviewer as a component defined during render.
@@ -63,15 +65,14 @@ export function HabitCard({
           {habit.name}
         </p>
         <p className="truncate text-xs text-slate-500">
-          {habit.category} · {describeFrequency(habit.frequency)} ·{' '}
-          {XP_HINT[habit.difficulty]}
+          {habit.category} · {describeFrequency(locale, habit.frequency)} · {xpHint}
         </p>
       </div>
 
       {onEdit !== undefined && (
         <button
           type="button"
-          aria-label={`Edit ${habit.name}`}
+          aria-label={t('habits.card.edit', { name: habit.name })}
           onClick={() => {
             onEdit(habit)
           }}
@@ -84,7 +85,7 @@ export function HabitCard({
       {onArchive !== undefined && (
         <button
           type="button"
-          aria-label={`Archive ${habit.name}`}
+          aria-label={t('habits.card.archive', { name: habit.name })}
           onClick={() => {
             onArchive(habit)
           }}
@@ -100,7 +101,9 @@ export function HabitCard({
         // two-state toggle, and screen readers should announce it as one.
         role="checkbox"
         aria-checked={completed}
-        aria-label={completed ? `Uncheck ${habit.name}` : `Complete ${habit.name}`}
+        aria-label={t(completed ? 'habits.card.uncheck' : 'habits.card.complete', {
+          name: habit.name,
+        })}
         disabled={disabled}
         onClick={() => {
           onToggle(habit.id)

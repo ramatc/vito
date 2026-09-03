@@ -1,12 +1,15 @@
 import type { FormEvent } from 'react'
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { Button } from '../../components/ui/Button'
 import { IconPicker } from '../../components/ui/IconPicker'
 import { XP_BY_DIFFICULTY } from '../../domain/habit/xpReward'
+import { useTranslate } from '../../hooks/useTranslate'
+import type { TranslationKey } from '../../i18n/keys'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import type { Difficulty, Frequency, Habit, Weekday } from '../../types/models'
 import { cn } from '../../utils/cn'
-import { DEFAULT_CATEGORY, SUGGESTED_CATEGORIES } from './categories'
-import { WEEKDAY_OPTIONS, buildFrequency } from './frequency'
+import { DEFAULT_CATEGORY_KEY, SUGGESTED_CATEGORY_KEYS } from './categories'
+import { buildFrequency, weekdayOptions } from './frequency'
 import { DEFAULT_HABIT_ICON, HABIT_ICONS } from './habitIcons'
 
 /**
@@ -32,15 +35,18 @@ export interface HabitFormProps {
   submitLabel?: string
 }
 
-// XP derived from the single source of truth rather than inlined: XP_BY_DIFFICULTY's
-// own comment says no call site may hardcode these numbers.
-const DIFFICULTIES: readonly { value: Difficulty; label: string; xp: string }[] = [
-  { value: 'easy', label: 'Easy', xp: `${String(XP_BY_DIFFICULTY.easy)} XP` },
-  { value: 'normal', label: 'Normal', xp: `${String(XP_BY_DIFFICULTY.normal)} XP` },
-  { value: 'hard', label: 'Hard', xp: `${String(XP_BY_DIFFICULTY.hard)} XP` },
-]
+const DIFFICULTY_ORDER: readonly Difficulty[] = ['easy', 'normal', 'hard']
+
+const DIFFICULTY_LABEL_KEYS: Record<Difficulty, TranslationKey> = {
+  easy: 'habits.difficulty.easy',
+  normal: 'habits.difficulty.normal',
+  hard: 'habits.difficulty.hard',
+}
 
 export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormProps) {
+  const t = useTranslate()
+  const locale = usePreferencesStore((state) => state.preferences.locale)
+
   const nameId = useId()
   const categoryId = useId()
   const categoryListId = useId()
@@ -48,7 +54,12 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
 
   const [name, setName] = useState(habit?.name ?? '')
   const [icon, setIcon] = useState(habit?.icon ?? DEFAULT_HABIT_ICON)
-  const [category, setCategory] = useState(habit?.category ?? DEFAULT_CATEGORY)
+  // Seeded once, from the language the form opened in. `category` is free-form
+  // user data from the moment it is on screen, so a later language switch must
+  // not silently rewrite what the user is about to save.
+  const [category, setCategory] = useState(
+    () => habit?.category ?? t(DEFAULT_CATEGORY_KEY),
+  )
   const [difficulty, setDifficulty] = useState<Difficulty>(habit?.difficulty ?? 'normal')
   const [frequencyType, setFrequencyType] = useState<Frequency['type']>(
     habit?.frequency.type ?? 'daily',
@@ -65,6 +76,9 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
   // rule expressed where the user can see it.
   const missingDays = frequencyType === 'weekdays' && days.length === 0
   const canSubmit = !missingName && !missingDays
+
+  // `Intl` builds these, so they change with the locale and nothing else.
+  const weekdays = useMemo(() => weekdayOptions(locale), [locale])
 
   const toggleDay = (day: Weekday) => {
     setDays((current) =>
@@ -101,7 +115,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
     <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-2">
         <label htmlFor={nameId} className="text-sm font-medium text-slate-700">
-          Name
+          {t('habits.form.name')}
         </label>
         <input
           id={nameId}
@@ -109,20 +123,29 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
           onChange={(event) => {
             setName(event.target.value)
           }}
-          placeholder="Drink water"
+          placeholder={t('habits.form.namePlaceholder')}
           autoComplete="off"
           className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
         />
         {showErrors && missingName && (
-          <p className="text-xs text-rose-600">Give your habit a name to save it.</p>
+          <p className="text-xs text-rose-600">{t('habits.form.nameError')}</p>
         )}
       </div>
 
-      <IconPicker options={HABIT_ICONS} value={icon} onChange={setIcon} label="Icon" />
+      {/*
+        The registry holds keys, not words, so the labels are resolved here on
+        the way into a ring that may not read the locale itself.
+      */}
+      <IconPicker
+        options={HABIT_ICONS.map((option) => ({ ...option, label: t(option.labelKey) }))}
+        value={icon}
+        onChange={setIcon}
+        label={t('habits.form.icon')}
+      />
 
       <div className="flex flex-col gap-2">
         <label htmlFor={categoryId} className="text-sm font-medium text-slate-700">
-          Category
+          {t('habits.form.category')}
         </label>
         <input
           id={categoryId}
@@ -131,19 +154,21 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
           onChange={(event) => {
             setCategory(event.target.value)
           }}
-          placeholder="Health"
+          placeholder={t(DEFAULT_CATEGORY_KEY)}
           autoComplete="off"
           className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
         />
         <datalist id={categoryListId}>
-          {SUGGESTED_CATEGORIES.map((suggestion) => (
-            <option key={suggestion} value={suggestion} />
+          {SUGGESTED_CATEGORY_KEYS.map((key) => (
+            <option key={key} value={t(key)} />
           ))}
         </datalist>
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium text-slate-700">Repeats</legend>
+        <legend className="mb-2 text-sm font-medium text-slate-700">
+          {t('habits.form.repeats')}
+        </legend>
         <div className="flex gap-2">
           <Button
             variant={frequencyType === 'daily' ? 'primary' : 'secondary'}
@@ -154,7 +179,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
               setFrequencyType('daily')
             }}
           >
-            Every day
+            {t('habits.frequency.daily')}
           </Button>
           <Button
             variant={frequencyType === 'weekdays' ? 'primary' : 'secondary'}
@@ -165,14 +190,14 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
               setFrequencyType('weekdays')
             }}
           >
-            Certain days
+            {t('habits.frequency.weekdays')}
           </Button>
         </div>
 
         {frequencyType === 'weekdays' && (
           <div className="mt-2 flex flex-col gap-2">
             <div className="flex gap-1.5">
-              {WEEKDAY_OPTIONS.map((option) => {
+              {weekdays.map((option) => {
                 const selected = days.includes(option.value)
 
                 return (
@@ -200,7 +225,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
             </div>
             {missingDays && (
               <p id={weekdayErrorId} className="text-xs text-slate-500">
-                Pick at least one day — a habit with no days would never come up.
+                {t('habits.form.daysError')}
               </p>
             )}
           </div>
@@ -208,43 +233,55 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
       </fieldset>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium text-slate-700">Difficulty</legend>
+        <legend className="mb-2 text-sm font-medium text-slate-700">
+          {t('habits.form.difficulty')}
+        </legend>
         <div className="flex gap-2">
-          {DIFFICULTIES.map((option) => (
-            <Button
-              key={option.value}
-              variant={difficulty === option.value ? 'primary' : 'secondary'}
-              size="sm"
-              fullWidth
-              aria-pressed={difficulty === option.value}
-              // Spelled out, because the label and the XP hint are adjacent
-              // elements with no whitespace between them: the computed name
-              // would otherwise be announced as "Hard30 XP".
-              aria-label={`${option.label}, ${option.xp}`}
-              onClick={() => {
-                setDifficulty(option.value)
-              }}
-            >
-              {option.label}
-              <span
-                className={cn(
-                  'text-[11px]',
-                  difficulty === option.value ? 'text-emerald-50' : 'text-slate-500',
-                )}
+          {DIFFICULTY_ORDER.map((option) => {
+            const selected = difficulty === option
+            const label = t(DIFFICULTY_LABEL_KEYS[option])
+            // XP derived from the single source of truth rather than inlined:
+            // XP_BY_DIFFICULTY's own comment says no call site may hardcode
+            // these numbers.
+            const xp = t('common.xp', { count: XP_BY_DIFFICULTY[option] })
+
+            return (
+              <Button
+                key={option}
+                variant={selected ? 'primary' : 'secondary'}
+                size="sm"
+                fullWidth
+                aria-pressed={selected}
+                // Spelled out, because the label and the XP hint are adjacent
+                // elements with no whitespace between them: the computed name
+                // would otherwise be announced as "Hard30 XP".
+                aria-label={`${label}, ${xp}`}
+                onClick={() => {
+                  setDifficulty(option)
+                }}
               >
-                {option.xp}
-              </span>
-            </Button>
-          ))}
+                {label}
+                <span
+                  className={cn(
+                    'text-[11px]',
+                    selected ? 'text-emerald-50' : 'text-slate-500',
+                  )}
+                >
+                  {xp}
+                </span>
+              </Button>
+            )
+          })}
         </div>
       </fieldset>
 
       <div className="flex justify-end gap-2">
         <Button variant="secondary" onClick={onCancel}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button type="submit" disabled={!canSubmit}>
-          {submitLabel ?? (habit === undefined ? 'Add habit' : 'Save changes')}
+          {submitLabel ??
+            t(habit === undefined ? 'habits.form.create' : 'habits.form.save')}
         </Button>
       </div>
     </form>

@@ -1,8 +1,17 @@
-import type { Frequency, Weekday } from '../../types/models'
+import { INTL_LOCALE_TAG } from '../../i18n/locale'
+import { t } from '../../i18n/translate'
+import type { Frequency, Locale, Weekday } from '../../types/models'
 
 /**
  * The weekday selector's data, plus the one place a runtime array of weekdays
  * becomes a persisted `Frequency`.
+ *
+ * Weekday names come from `Intl`, not from the dictionary. A weekday is not
+ * copy — it is a calendar fact every locale already knows, and hand-translating
+ * seven names in two lengths would be fourteen dictionary entries that can drift
+ * from what the user's own date picker says. `INTL_LOCALE_TAG` exists for
+ * exactly this: the dictionary key names a language bucket, the tag names the
+ * region whose conventions apply.
  */
 
 export interface WeekdayOption {
@@ -14,24 +23,47 @@ export interface WeekdayOption {
 }
 
 /** Monday first — how people read a week — while the values stay JS-native. */
-export const WEEKDAY_OPTIONS: readonly WeekdayOption[] = [
-  { value: 1, short: 'M', label: 'Monday' },
-  { value: 2, short: 'T', label: 'Tuesday' },
-  { value: 3, short: 'W', label: 'Wednesday' },
-  { value: 4, short: 'T', label: 'Thursday' },
-  { value: 5, short: 'F', label: 'Friday' },
-  { value: 6, short: 'S', label: 'Saturday' },
-  { value: 0, short: 'S', label: 'Sunday' },
-]
+const WEEKDAY_ORDER: readonly Weekday[] = [1, 2, 3, 4, 5, 6, 0]
 
-const SHORT_NAMES: Record<Weekday, string> = {
-  0: 'Sun',
-  1: 'Mon',
-  2: 'Tue',
-  3: 'Wed',
-  4: 'Thu',
-  5: 'Fri',
-  6: 'Sat',
+/**
+ * 2024-01-07 was a Sunday, so this date plus `day` whole days always lands on
+ * the weekday whose JS number is `day`. Everything stays in UTC, so no machine's
+ * timezone can shift the answer by one.
+ */
+const REFERENCE_SUNDAY_UTC = Date.UTC(2024, 0, 7)
+const DAY_MS = 86_400_000
+
+type WeekdayWidth = 'long' | 'short' | 'narrow'
+
+/**
+ * Constructing an `Intl.DateTimeFormat` is expensive and `describeFrequency`
+ * runs once per row of the habit list, so the formatters are cached by the pair
+ * that defines them. There are six possible entries.
+ */
+const FORMATTERS = new Map<string, Intl.DateTimeFormat>()
+
+function weekdayName(locale: Locale, width: WeekdayWidth, day: Weekday): string {
+  const cacheKey = `${locale}:${width}`
+  let format = FORMATTERS.get(cacheKey)
+
+  if (format === undefined) {
+    format = new Intl.DateTimeFormat(INTL_LOCALE_TAG[locale], {
+      weekday: width,
+      timeZone: 'UTC',
+    })
+    FORMATTERS.set(cacheKey, format)
+  }
+
+  return format.format(new Date(REFERENCE_SUNDAY_UTC + day * DAY_MS))
+}
+
+/** The selector's seven buttons, named in the active locale. */
+export function weekdayOptions(locale: Locale): readonly WeekdayOption[] {
+  return WEEKDAY_ORDER.map((value) => ({
+    value,
+    short: weekdayName(locale, 'narrow', value),
+    label: weekdayName(locale, 'long', value),
+  }))
 }
 
 /**
@@ -68,15 +100,18 @@ export function buildFrequency(
   return { type: 'weekdays', days: [...days] }
 }
 
-/** Human-readable schedule, e.g. "Every day" or "Mon, Wed, Fri". */
-export function describeFrequency(frequency: Frequency): string {
+/**
+ * Human-readable schedule in the active locale, e.g. "Every day" / "Mon, Wed,
+ * Fri" in English, "Todos los días" / "lun, mié, vie" in Spanish.
+ */
+export function describeFrequency(locale: Locale, frequency: Frequency): string {
   if (frequency.type === 'daily') {
-    return 'Every day'
+    return t(locale, 'habits.frequency.daily')
   }
 
   const selected = new Set<Weekday>(frequency.days)
 
-  return WEEKDAY_OPTIONS.filter((option) => selected.has(option.value))
-    .map((option) => SHORT_NAMES[option.value])
+  return WEEKDAY_ORDER.filter((day) => selected.has(day))
+    .map((day) => weekdayName(locale, 'short', day))
     .join(', ')
 }
