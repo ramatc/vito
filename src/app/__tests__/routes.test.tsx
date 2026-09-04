@@ -699,3 +699,144 @@ describe('the worst state Vito can be in', () => {
     expect(screen.getByText(`${String(MOMENTUM.MIN)} / 100`)).toBeInTheDocument()
   })
 })
+
+/**
+ * The progress ring, driven from Home the way a user meets it.
+ *
+ * This ring is the one place in the app where the copy is not a lookup but a
+ * composition: the level band, the streak and the comeback bonus all fold a
+ * number into a sentence, and two of them change shape at one. So what is worth
+ * pinning is not only that the words are Spanish, but that the plural forms
+ * resolve per count and that the three branches nothing else exercises — max
+ * level, no streak yet, an active boost — each render their own sentence.
+ */
+describe('the progress ring in the active language', () => {
+  /** Level 2 spans 100..283, so 150 XP is 50 into a 183-wide band. */
+  const MID_RUN = {
+    totalXp: 150,
+    momentum: 42,
+    currentStreak: 3,
+    longestStreak: 9,
+  }
+
+  it('writes the level, the momentum and the streak in Spanish', async () => {
+    await boot({ progress: MID_RUN })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(screen.getByRole('region', { name: 'Tu progreso' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: 'Nivel 2' })).toBeInTheDocument()
+    expect(screen.getByText('50 / 183 XP para el nivel 3')).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: 'Impulso' })).toBeInTheDocument()
+    expect(
+      screen.getByText('El impulso baja cuando todo se aquieta, y nunca se vacía.'),
+    ).toBeInTheDocument()
+    expect(screen.getByText('Racha de 3 días')).toBeInTheDocument()
+    expect(screen.getByText('Tu mejor marca: 9 días')).toBeInTheDocument()
+  })
+
+  it('writes the same surfaces in English, from the same one source', async () => {
+    await boot({ progress: MID_RUN })
+
+    render(<App />)
+
+    expect(screen.getByRole('region', { name: 'Your progress' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: 'Level 2' })).toBeInTheDocument()
+    expect(screen.getByText('50 / 183 XP to level 3')).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: 'Momentum' })).toBeInTheDocument()
+    expect(screen.getByText('3-day streak')).toBeInTheDocument()
+    expect(screen.getByText('Best so far: 9 days')).toBeInTheDocument()
+  })
+
+  /**
+   * The `one` form of both streak sentences. English spells them the same way at
+   * every count, which is exactly why the pair cannot be inferred from English:
+   * only the Spanish half moves.
+   */
+  it('uses the singular streak forms for a one-day run', async () => {
+    await boot({ progress: { ...MID_RUN, currentStreak: 1, longestStreak: 1 } })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(screen.getByText('Racha de 1 día')).toBeInTheDocument()
+    expect(screen.getByText('Tu mejor marca: 1 día')).toBeInTheDocument()
+  })
+
+  it('invites a first day in Spanish when there is no streak yet', async () => {
+    await boot({ progress: { ...MID_RUN, currentStreak: 0, longestStreak: 0 } })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(screen.getByText('Hoy puede ser el día uno')).toBeInTheDocument()
+    expect(screen.getByText('Acá va a aparecer tu mejor marca')).toBeInTheDocument()
+  })
+
+  /** Level 99 is the ceiling, and the band line becomes a statement instead. */
+  it('names the ceiling in Spanish at the top level', async () => {
+    await boot({ progress: { ...MID_RUN, totalXp: 100_000 } })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(screen.getByRole('progressbar', { name: 'Nivel 99' })).toBeInTheDocument()
+    expect(screen.getByText('Nivel máximo')).toBeInTheDocument()
+  })
+
+  it('writes the comeback bonus in Spanish, in both plural forms', async () => {
+    await boot({
+      progress: {
+        ...MID_RUN,
+        activeBoost: {
+          remainingCompletions: 3,
+          multiplier: 2,
+          triggeredOn: '2026-01-01',
+        },
+      },
+    })
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    const { unmount } = render(<App />)
+
+    expect(
+      screen.getByText(
+        'Bonus de bienvenida: los próximos 3 hábitos que completes suman XP extra.',
+      ),
+    ).toBeInTheDocument()
+
+    unmount()
+    await boot({
+      progress: {
+        ...MID_RUN,
+        activeBoost: {
+          remainingCompletions: 1,
+          multiplier: 2,
+          triggeredOn: '2026-01-01',
+        },
+      },
+    })
+    render(<App />)
+
+    expect(
+      screen.getByText(
+        'Bonus de bienvenida: el próximo hábito que completes suma XP extra.',
+      ),
+    ).toBeInTheDocument()
+  })
+
+  it('repaints the ring when the language changes mid-session', async () => {
+    await boot({ progress: MID_RUN })
+    render(<App />)
+
+    expect(screen.getByText('3-day streak')).toBeInTheDocument()
+
+    await act(async () => {
+      await usePreferencesStore.getState().setLocale('es')
+    })
+
+    expect(screen.getByText('Racha de 3 días')).toBeInTheDocument()
+    expect(screen.queryByText('3-day streak')).not.toBeInTheDocument()
+  })
+})

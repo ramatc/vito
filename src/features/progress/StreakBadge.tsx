@@ -8,20 +8,25 @@ import { cn } from '../../utils/cn'
  * A zero streak is the only state worth special copy, and it reads as an
  * invitation. The domain resets a broken streak to 1 rather than 0 precisely so
  * this component never has to render "0" after a quiet stretch.
+ *
+ * Both sentences arrive resolved from `ProgressSection`, and so does the one
+ * predicate they turn on. Taking `hasStreak` rather than the raw count is what
+ * makes it impossible to paint the warm state next to the invitation copy: the
+ * question is asked once, upstream, where the words are chosen.
  */
 
 export interface StreakBadgeProps {
-  currentStreak: number
-  longestStreak: number
+  /** Whether a streak is running. Drives the warm palette. */
+  hasStreak: boolean
+  /** The streak itself, e.g. "3-day streak", or the invitation. */
+  headline: string
+  /** The personal best line, or the placeholder for someone who has none. */
+  best: string
   className?: string
 }
 
-export function StreakBadge({
-  currentStreak,
-  longestStreak,
-  className,
-}: StreakBadgeProps) {
-  const started = currentStreak > 0
+export function StreakBadge({ hasStreak, headline, best, className }: StreakBadgeProps) {
+  const started = hasStreak
 
   return (
     <div
@@ -35,14 +40,8 @@ export function StreakBadge({
         className={cn('size-5 shrink-0', started ? 'text-amber-500' : 'text-slate-400')}
       />
       <div className="min-w-0">
-        <p className="text-sm font-medium">
-          {started ? `${String(currentStreak)}-day streak` : 'Today can be day one'}
-        </p>
-        <p className="text-xs opacity-80">
-          {longestStreak > 0
-            ? `Best so far: ${String(longestStreak)} days`
-            : 'Your best run shows up here'}
-        </p>
+        <p className="text-sm font-medium">{headline}</p>
+        <p className="text-xs opacity-80">{best}</p>
       </div>
     </div>
   )
