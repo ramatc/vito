@@ -59,7 +59,12 @@ function App() {
             {t('app.storageError')}
           </div>
         )}
-        <ErrorBoundary>
+        {/*
+          The boundary is a class, so it cannot look its own copy up. Resolving
+          it here rather than inside it is what keeps the fallback in the
+          reader's language without giving a class component a hook.
+        */}
+        <ErrorBoundary title={t('app.error.title')} hint={t('app.error.hint')}>
           <AppRoutes />
         </ErrorBoundary>
         <Toaster
