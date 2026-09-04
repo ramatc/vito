@@ -31,6 +31,7 @@ export const EN = {
   'common.dismiss': 'Dismiss',
   'common.xp': '{count} XP',
   'common.xpGain': '+{count} XP',
+  'common.and': 'and',
   'common.error.save': "Couldn't save that, try again.",
 
   'settings.language.label': 'Language',
@@ -116,6 +117,34 @@ export const EN = {
   'habits.toast.unlock': '{xp} — something new is waiting in the closet.',
   'habits.toast.comeback': '{xp} — welcome back bonus.',
   'habits.toast.undo': 'Unchecked for today.',
+
+  'closet.title': 'Closet',
+  'closet.description':
+    'Everything Vito has earned. Wear what you like — nothing is ever used up.',
+  'closet.worn.none': 'Vito is going as himself today.',
+  'closet.worn.some': 'Vito is wearing {items}.',
+  'closet.worn.hint':
+    'He wears it on the Today screen. Each slot is separate, so a new hat keeps everything else on.',
+  'closet.slots.label': 'Cosmetic slots',
+  'closet.slot.hat': 'Hats',
+  'closet.slot.backpack': 'Packs',
+  'closet.slot.aura': 'Auras',
+  'closet.rarity.common': 'Common',
+  'closet.rarity.rare': 'Rare',
+  'closet.rarity.legendary': 'Legendary',
+  'closet.unlock.level': 'Unlocks at level {value}',
+  'closet.unlock.xp': 'Unlocks at {value} XP',
+  'closet.unlock.streak': 'Unlocks with a {value}-day streak',
+  'closet.item.worn': 'Worn — tap to take off',
+  'closet.item.wear': 'Tap to wear',
+
+  // Looked up by cosmetic id through `features/rewards/cosmeticCopy.ts`. The
+  // catalog in `domain/` holds the id and nothing a translator would touch.
+  'cosmetic.hatSprout.name': 'Sprout Cap',
+  'cosmetic.backpackExplorer.name': "Explorer's Pack",
+  'cosmetic.auraGlow.name': 'Warm Glow',
+
+  'vito.avatar.wearing': ', wearing {items}',
 
   'progress.streak.best.one': 'Best so far: {count} day',
   'progress.streak.best.other': 'Best so far: {count} days',
