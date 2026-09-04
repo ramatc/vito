@@ -37,7 +37,7 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
       .then(() => {
         useUiStore
           .getState()
-          .pushToast({ message: 'Everything is back to day one.', tone: 'info' })
+          .pushToast({ message: t('settings.reset.done'), tone: 'info' })
       })
       .catch(() => {
         useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
@@ -48,7 +48,7 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
   }
 
   return (
-    <Screen title="Settings" description="Your data stays on this device.">
+    <Screen title={t('settings.title')} description={t('settings.description')}>
       {/*
         First card on the screen: these two are the only settings that change
         what the app looks like, and the rest of this screen is information and
@@ -60,23 +60,18 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
       </Card>
 
       <Card className="flex flex-col gap-2 text-sm text-slate-600">
-        <h2 className="text-sm font-medium text-slate-900">Where your data lives</h2>
-        <p>
-          Vito keeps everything in this browser. There is no account, nothing is uploaded,
-          and nobody else can see it.
-        </p>
-        <p className="text-xs text-slate-500">
-          The flip side: clearing this browser&apos;s site data, or opening Vito in
-          another browser, starts from scratch. Export and sync are not in this version.
-        </p>
+        <h2 className="text-sm font-medium text-slate-900">
+          {t('settings.storage.title')}
+        </h2>
+        <p>{t('settings.storage.body')}</p>
+        <p className="text-xs text-slate-500">{t('settings.storage.caveat')}</p>
       </Card>
 
       <Card className="flex flex-col items-start gap-3 text-sm text-slate-600">
-        <h2 className="text-sm font-medium text-slate-900">Start over</h2>
-        <p>
-          Clears your habits, your history and everything Vito has earned, and puts him
-          back at day one. This one cannot be undone.
-        </p>
+        <h2 className="text-sm font-medium text-slate-900">
+          {t('settings.reset.title')}
+        </h2>
+        <p>{t('settings.reset.description')}</p>
         <Button
           variant="danger"
           disabled={resetting}
@@ -84,7 +79,7 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
             setConfirming(true)
           }}
         >
-          {resetting ? 'Starting over…' : 'Reset progress'}
+          {resetting ? t('settings.reset.pending') : t('settings.reset.action')}
         </Button>
       </Card>
 
