@@ -42,10 +42,9 @@ function wornSummary(
 }
 
 export function ClosetScreen() {
-  // The rest of this screen's copy is still English literals — PR5 sweeps them.
-  // This one moved early because the constant it used to read lived in a hook
-  // the habits slice owns, and that hook now speaks the active language.
   const t = useTranslate()
+  // The raw locale as well as the translator: `cosmeticName` builds its key
+  // from an id, which `useTranslate` deliberately will not accept.
   const locale = usePreferencesStore((state) => state.preferences.locale)
   const { equippedItems, unlockedItemIds } = useVito()
   const [slot, setSlot] = useState<CosmeticSlot>('hat')
@@ -65,16 +64,10 @@ export function ClosetScreen() {
   }
 
   return (
-    <Screen
-      title="Closet"
-      description="Everything Vito has earned. Wear what you like — nothing is ever used up."
-    >
+    <Screen title={t('closet.title')} description={t('closet.description')}>
       <Card className="text-sm text-slate-600">
         <p>{wornSummary(t, locale, equippedItems)}</p>
-        <p className="mt-1 text-xs text-slate-500">
-          He wears it on the Today screen. Each slot is separate, so a new hat keeps
-          everything else on.
-        </p>
+        <p className="mt-1 text-xs text-slate-500">{t('closet.worn.hint')}</p>
       </Card>
 
       <SlotPicker value={slot} onChange={setSlot} />

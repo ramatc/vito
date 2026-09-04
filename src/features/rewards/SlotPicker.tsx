@@ -1,3 +1,5 @@
+import type { TranslationKey } from '../../i18n/keys'
+import { useTranslate } from '../../hooks/useTranslate'
 import type { CosmeticSlot } from '../../types/models'
 import { cn } from '../../utils/cn'
 
@@ -14,13 +16,13 @@ import { cn } from '../../utils/cn'
 
 interface ClosetSlot {
   slot: CosmeticSlot
-  label: string
+  labelKey: TranslationKey
 }
 
 const CLOSET_SLOTS: readonly ClosetSlot[] = [
-  { slot: 'hat', label: 'Hats' },
-  { slot: 'backpack', label: 'Packs' },
-  { slot: 'aura', label: 'Auras' },
+  { slot: 'hat', labelKey: 'closet.slot.hat' },
+  { slot: 'backpack', labelKey: 'closet.slot.backpack' },
+  { slot: 'aura', labelKey: 'closet.slot.aura' },
 ]
 
 export interface SlotPickerProps {
@@ -30,10 +32,12 @@ export interface SlotPickerProps {
 }
 
 export function SlotPicker({ value, onChange, className }: SlotPickerProps) {
+  const t = useTranslate()
+
   return (
     <div
       role="group"
-      aria-label="Cosmetic slots"
+      aria-label={t('closet.slots.label')}
       className={cn('flex gap-2 overflow-x-auto', className)}
     >
       {CLOSET_SLOTS.map((entry) => {
@@ -55,7 +59,7 @@ export function SlotPicker({ value, onChange, className }: SlotPickerProps) {
                 : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400',
             )}
           >
-            {entry.label}
+            {t(entry.labelKey)}
           </button>
         )
       })}

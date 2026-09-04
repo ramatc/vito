@@ -1,9 +1,13 @@
 import { Check, Lock } from 'lucide-react'
+import { useTranslate } from '../../hooks/useTranslate'
+import type { TranslationKey } from '../../i18n/keys'
 import { usePreferencesStore } from '../../stores/preferencesStore'
 import type { CosmeticItem } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { COSMETIC_ASSETS } from './cosmeticAssets'
 import { cosmeticName } from './cosmeticCopy'
+
+type Translate = ReturnType<typeof useTranslate>
 
 /**
  * One slot's worth of the catalog: what is earned, what is worn, and what is
@@ -17,23 +21,30 @@ import { cosmeticName } from './cosmeticCopy'
  * plainly. Nothing here scolds: a threshold is a destination, not a shortfall.
  */
 
-const RARITY_LABEL: Record<CosmeticItem['rarity'], string> = {
-  common: 'Common',
-  rare: 'Rare',
-  legendary: 'Legendary',
+const RARITY_LABEL_KEYS: Record<CosmeticItem['rarity'], TranslationKey> = {
+  common: 'closet.rarity.common',
+  rare: 'closet.rarity.rare',
+  legendary: 'closet.rarity.legendary',
 }
 
-const UNLOCK_LABEL: Record<
+/**
+ * One key per requirement type rather than one sentence with a slot for the
+ * unit: "a 7-day streak" and "2000 XP" are not the same sentence in Spanish,
+ * and a translator must be free to rebuild each one whole.
+ */
+const UNLOCK_LABEL_KEYS: Record<
   CosmeticItem['unlockRequirement']['type'],
-  (value: number) => string
+  TranslationKey
 > = {
-  level: (value) => `Unlocks at level ${String(value)}`,
-  xp: (value) => `Unlocks at ${String(value)} XP`,
-  streak: (value) => `Unlocks with a ${String(value)}-day streak`,
+  level: 'closet.unlock.level',
+  xp: 'closet.unlock.xp',
+  streak: 'closet.unlock.streak',
 }
 
-function unlockLabel(item: CosmeticItem): string {
-  return UNLOCK_LABEL[item.unlockRequirement.type](item.unlockRequirement.value)
+function unlockLabel(t: Translate, item: CosmeticItem): string {
+  return t(UNLOCK_LABEL_KEYS[item.unlockRequirement.type], {
+    value: item.unlockRequirement.value,
+  })
 }
 
 /**
@@ -66,6 +77,7 @@ export function CosmeticGrid({
   onEquip,
   onUnequip,
 }: CosmeticGridProps) {
+  const t = useTranslate()
   const locale = usePreferencesStore((state) => state.preferences.locale)
 
   return (
@@ -89,10 +101,10 @@ export function CosmeticGrid({
                 </span>
                 <span className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
                   <Lock className="size-3 shrink-0" />
-                  {unlockLabel(item)}
+                  {unlockLabel(t, item)}
                 </span>
                 <span className="mt-0.5 block text-xs text-slate-400">
-                  {RARITY_LABEL[item.rarity]}
+                  {t(RARITY_LABEL_KEYS[item.rarity])}
                 </span>
               </span>
             </li>
@@ -129,7 +141,7 @@ export function CosmeticGrid({
                   {cosmeticName(locale, item.id)}
                 </span>
                 <span className="mt-0.5 block text-xs text-slate-500">
-                  {RARITY_LABEL[item.rarity]}
+                  {t(RARITY_LABEL_KEYS[item.rarity])}
                 </span>
                 <span
                   className={cn(
@@ -138,7 +150,7 @@ export function CosmeticGrid({
                   )}
                 >
                   {equipped && <Check className="size-3 shrink-0" />}
-                  {equipped ? 'Worn — tap to take off' : 'Tap to wear'}
+                  {equipped ? t('closet.item.worn') : t('closet.item.wear')}
                 </span>
               </span>
             </button>
