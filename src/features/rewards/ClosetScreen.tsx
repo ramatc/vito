@@ -5,8 +5,10 @@ import { COSMETIC_CATALOG } from '../../domain/vito/cosmeticCatalog'
 import { useTranslate } from '../../hooks/useTranslate'
 import { useVito } from '../../hooks/useVito'
 import { useUiStore } from '../../stores/uiStore'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import { useVitoStore } from '../../stores/vitoStore'
-import type { CosmeticSlot, EquippedItems } from '../../types/models'
+import type { CosmeticSlot, EquippedItems, Locale } from '../../types/models'
+import { cosmeticName } from './cosmeticCopy'
 import { CosmeticGrid } from './CosmeticGrid'
 import { SlotPicker } from './SlotPicker'
 
@@ -23,16 +25,20 @@ import { SlotPicker } from './SlotPicker'
  */
 
 /** What Vito is wearing right now, across every slot, in one line. */
-function wornSummary(equippedItems: EquippedItems): string {
+function wornSummary(
+  t: ReturnType<typeof useTranslate>,
+  locale: Locale,
+  equippedItems: EquippedItems,
+): string {
   const names = COSMETIC_CATALOG.filter(
     (item) => equippedItems[item.slot] === item.id,
-  ).map((item) => item.name)
+  ).map((item) => cosmeticName(locale, item.id))
 
   if (names.length === 0) {
-    return 'Vito is going as himself today.'
+    return t('closet.worn.none')
   }
 
-  return `Vito is wearing ${names.join(' and ')}.`
+  return t('closet.worn.some', { items: names.join(` ${t('common.and')} `) })
 }
 
 export function ClosetScreen() {
@@ -40,6 +46,7 @@ export function ClosetScreen() {
   // This one moved early because the constant it used to read lived in a hook
   // the habits slice owns, and that hook now speaks the active language.
   const t = useTranslate()
+  const locale = usePreferencesStore((state) => state.preferences.locale)
   const { equippedItems, unlockedItemIds } = useVito()
   const [slot, setSlot] = useState<CosmeticSlot>('hat')
 
@@ -63,7 +70,7 @@ export function ClosetScreen() {
       description="Everything Vito has earned. Wear what you like — nothing is ever used up."
     >
       <Card className="text-sm text-slate-600">
-        <p>{wornSummary(equippedItems)}</p>
+        <p>{wornSummary(t, locale, equippedItems)}</p>
         <p className="mt-1 text-xs text-slate-500">
           He wears it on the Today screen. Each slot is separate, so a new hat keeps
           everything else on.

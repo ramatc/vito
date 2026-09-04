@@ -4,10 +4,13 @@ import { COSMETIC_CATALOG } from '../../../domain/vito/cosmeticCatalog'
 import { resolveLayers } from '../../../domain/vito/cosmetics'
 import type { EvolutionStage } from '../../../domain/vito/evolution'
 import type { Mood } from '../../../domain/vito/mood'
+import { useTranslate } from '../../../hooks/useTranslate'
 import { useVitoReaction } from '../../../hooks/useVitoReaction'
-import type { EquippedItems } from '../../../types/models'
+import { usePreferencesStore } from '../../../stores/preferencesStore'
+import type { EquippedItems, Locale } from '../../../types/models'
 import { cn } from '../../../utils/cn'
 import { COSMETIC_ASSETS } from '../../rewards/cosmeticAssets'
+import { cosmeticName } from '../../rewards/cosmeticCopy'
 import { idleStateFor, reducedVitoVariants, vitoVariants } from '../animation/variants'
 import { MOOD_ALT_TEXT } from '../copy/moodMessages'
 
@@ -84,13 +87,29 @@ function mouthClass(mood: Mood): string {
   }
 }
 
-/** "wearing X and Y", or nothing at all when he is going as himself. */
-function wornDescription(itemIds: readonly string[]): string {
-  const names = COSMETIC_CATALOG.filter((item) => itemIds.includes(item.id)).map(
-    (item) => item.name,
+/** The translator `useTranslate` hands out — this ring cannot import `i18n/`. */
+type Translate = ReturnType<typeof useTranslate>
+
+/**
+ * "wearing X and Y", or nothing at all when he is going as himself.
+ *
+ * Still filtered through the catalog rather than through the layer stack, so
+ * the reading order stays catalog order instead of back-to-front paint order.
+ */
+function wornDescription(
+  t: Translate,
+  locale: Locale,
+  itemIds: readonly string[],
+): string {
+  const names = COSMETIC_CATALOG.filter((item) => itemIds.includes(item.id)).map((item) =>
+    cosmeticName(locale, item.id),
   )
 
-  return names.length === 0 ? '' : `, wearing ${names.join(' and ')}`
+  if (names.length === 0) {
+    return ''
+  }
+
+  return t('vito.avatar.wearing', { items: names.join(` ${t('common.and')} `) })
 }
 
 export interface VitoAvatarProps {
@@ -111,6 +130,11 @@ export function VitoAvatar({
   className,
 }: VitoAvatarProps) {
   const { reaction, prefersReducedMotion, endReaction } = useVitoReaction()
+  const t = useTranslate()
+  // The raw locale as well as the translator: `cosmeticName` takes a `Locale`
+  // because its key is assembled from an id, which `useTranslate` deliberately
+  // will not accept. Same pair `HabitCard` already holds.
+  const locale = usePreferencesStore((state) => state.preferences.locale)
   const controls = useAnimationControls()
   const look = STAGE_LOOK[stage]
   const idleState = idleStateFor({ mood, allDone })
@@ -162,6 +186,8 @@ export function VitoAvatar({
       // of empty decorative spans and learns nothing.
       role="img"
       aria-label={`Vito, ${look.description}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
+        t,
+        locale,
         layers.map((layer) => layer.itemId),
       )}`}
     >

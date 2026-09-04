@@ -1,7 +1,9 @@
 import { Check, Lock } from 'lucide-react'
+import { usePreferencesStore } from '../../stores/preferencesStore'
 import type { CosmeticItem } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { COSMETIC_ASSETS } from './cosmeticAssets'
+import { cosmeticName } from './cosmeticCopy'
 
 /**
  * One slot's worth of the catalog: what is earned, what is worn, and what is
@@ -64,6 +66,8 @@ export function CosmeticGrid({
   onEquip,
   onUnequip,
 }: CosmeticGridProps) {
+  const locale = usePreferencesStore((state) => state.preferences.locale)
+
   return (
     <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {items.map((item) => {
@@ -81,7 +85,7 @@ export function CosmeticGrid({
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-medium text-slate-900">
-                  {item.name}
+                  {cosmeticName(locale, item.id)}
                 </span>
                 <span className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
                   <Lock className="size-3 shrink-0" />
@@ -122,7 +126,7 @@ export function CosmeticGrid({
               <ItemPreview assetRef={item.assetRef} />
               <span className="min-w-0">
                 <span className="block text-sm font-medium text-slate-900">
-                  {item.name}
+                  {cosmeticName(locale, item.id)}
                 </span>
                 <span className="mt-0.5 block text-xs text-slate-500">
                   {RARITY_LABEL[item.rarity]}

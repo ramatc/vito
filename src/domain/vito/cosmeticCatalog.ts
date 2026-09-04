@@ -21,7 +21,6 @@ import type { CosmeticItem } from '../../types/models'
 export const COSMETIC_CATALOG: readonly CosmeticItem[] = [
   {
     id: 'hat-sprout',
-    name: 'Sprout Cap',
     slot: 'hat',
     rarity: 'common',
     // Lines up with the first evolution bracket, so growing up and getting a
@@ -31,7 +30,6 @@ export const COSMETIC_CATALOG: readonly CosmeticItem[] = [
   },
   {
     id: 'backpack-explorer',
-    name: "Explorer's Pack",
     slot: 'backpack',
     rarity: 'rare',
     unlockRequirement: { type: 'streak', value: 7 },
@@ -39,7 +37,6 @@ export const COSMETIC_CATALOG: readonly CosmeticItem[] = [
   },
   {
     id: 'aura-glow',
-    name: 'Warm Glow',
     slot: 'aura',
     rarity: 'legendary',
     unlockRequirement: { type: 'xp', value: 2000 },

@@ -122,7 +122,6 @@ export interface AppPreferences {
 
 export interface CosmeticItem {
   id: string
-  name: string
   slot: CosmeticSlot
   /** Display tier only — never used as a drop weight. Unlocks are deterministic. */
   rarity: 'common' | 'rare' | 'legendary'
