@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from '../components/ui/Toaster'
+import { useTranslate } from '../hooks/useTranslate'
 import { usePreferencesStore } from '../stores/preferencesStore'
 import { useUiStore } from '../stores/uiStore'
 import { watchDayRollover } from './bootstrap'
@@ -24,6 +25,7 @@ import { AppRoutes } from './routes'
  * reach it.
  */
 function App() {
+  const t = useTranslate()
   const toasts = useUiStore((state) => state.toasts)
   const dismissToast = useUiStore((state) => state.dismissToast)
   const storageError = useUiStore((state) => state.storageError)
@@ -44,9 +46,9 @@ function App() {
         {/*
           A live region rather than a silent strip: the one thing that must not
           happen is someone completing habits for ten minutes while nothing is
-          being written. The copy names the likely cause instead of only stating
-          the symptom, because "might not be saving" alone leaves nothing to do
-          about it.
+          being written. The dictionary entry, not `storageError` itself — the
+          store holds the browser's own message, which is a diagnostic in one
+          language and not something to read to a user.
         */}
         {storageError !== null && (
           <div
@@ -54,21 +56,15 @@ function App() {
             aria-live="polite"
             className="bg-amber-50 px-4 py-2 text-center text-xs text-amber-800"
           >
-            Vito can&apos;t save to this browser right now, so today&apos;s progress might
-            not be kept. Check that site data is allowed and that storage isn&apos;t full.
+            {t('app.storageError')}
           </div>
         )}
         <ErrorBoundary>
           <AppRoutes />
         </ErrorBoundary>
-        {/*
-          Still a literal: `Toaster` handed its copy back to its caller, and the
-          app ring's own strings are swept in a later slice. The string is the
-          one the component used to embed, so nothing on screen moved.
-        */}
         <Toaster
           toasts={toasts}
-          dismissLabel="Dismiss message"
+          dismissLabel={t('common.dismiss')}
           onDismiss={dismissToast}
         />
       </BrowserRouter>

@@ -448,6 +448,129 @@ describe('Settings — reset progress', () => {
 })
 
 /**
+ * The settings ring in the other language.
+ *
+ * The three cases above are the English partners — they assert the same
+ * surfaces from the same source and must not move. What is new here is that the
+ * screen, the warning it puts in front of the only irreversible action, and the
+ * toast a promise pushes afterwards all resolve through the dictionary.
+ */
+describe('Settings in the active language', () => {
+  const lived: FakeSeed = {
+    progress: { totalXp: 900, currentStreak: 4, longestStreak: 9 },
+  }
+
+  async function bootInSpanish(seed: FakeSeed = {}) {
+    const fake = await boot(seed)
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    return fake
+  }
+
+  it('writes the whole settings screen in Spanish', async () => {
+    await bootInSpanish()
+    render(<App />)
+
+    await goTo('Ajustes')
+
+    expect(screen.getByRole('heading', { name: 'Ajustes', level: 1 })).toBeInTheDocument()
+    expect(
+      screen.getByText('Tus datos se quedan en este dispositivo.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Dónde viven tus datos' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Empezar de nuevo' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Reiniciar el progreso' }),
+    ).toBeInTheDocument()
+  })
+
+  /**
+   * The dialog's own doc comment says the wording IS the safety mechanism. In a
+   * second language that is only true if all four of its strings arrive
+   * translated — including the header's close control, which PR3 left as a
+   * literal on purpose.
+   */
+  it('asks for confirmation in Spanish, close control included', async () => {
+    await bootInSpanish(lived)
+    render(<App />)
+
+    await goTo('Ajustes')
+    await userEvent.click(screen.getByRole('button', { name: 'Reiniciar el progreso' }))
+
+    expect(
+      screen.getByRole('heading', { name: '¿Empezar de nuevo con Vito?' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Empezar de nuevo' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Conservar mi progreso' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeInTheDocument()
+  })
+
+  it('confirms in Spanish that the reset happened', async () => {
+    await bootInSpanish(lived)
+    render(<App />)
+
+    await goTo('Ajustes')
+    await userEvent.click(screen.getByRole('button', { name: 'Reiniciar el progreso' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Empezar de nuevo' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Todo volvió al día uno.')).toBeInTheDocument()
+    })
+  })
+})
+
+/**
+ * The two strings the app ring renders itself, rather than routing to a screen.
+ *
+ * Both sit above the routes — the storage banner because it must survive
+ * navigation, the toast viewport because a message must too — so neither is
+ * reachable from any feature test. They are the last English literals `app/`
+ * owned.
+ */
+describe('the app ring in the active language', () => {
+  it('warns about broken storage in Spanish', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    useUiStore.setState({ storageError: 'QuotaExceededError' })
+
+    render(<App />)
+
+    expect(screen.getByText(/^Vito no puede guardar/)).toBeInTheDocument()
+  })
+
+  it('warns about it in English from the same one source', async () => {
+    await boot()
+    useUiStore.setState({ storageError: 'QuotaExceededError' })
+
+    render(<App />)
+
+    expect(screen.getByText(/^Vito can't save/)).toBeInTheDocument()
+  })
+
+  it('names the toast dismiss control from the dictionary', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+    useUiStore.getState().pushToast({ message: 'Listo.', tone: 'info' })
+
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: 'Descartar' })).toBeInTheDocument()
+  })
+
+  it('names it in English too', async () => {
+    await boot()
+    useUiStore.getState().pushToast({ message: 'Done.', tone: 'info' })
+
+    render(<App />)
+
+    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument()
+  })
+})
+
+/**
  * The two controls the whole change exists for, driven the way a user reaches
  * them: navigate to Settings and click.
  *
