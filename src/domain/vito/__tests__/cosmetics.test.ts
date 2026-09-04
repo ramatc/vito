@@ -10,7 +10,6 @@ import {
 
 const HAT: CosmeticItem = {
   id: 'hat-sprout',
-  name: 'Sprout Cap',
   slot: 'hat',
   rarity: 'common',
   unlockRequirement: { type: 'level', value: 4 },
@@ -19,7 +18,6 @@ const HAT: CosmeticItem = {
 
 const BACKPACK: CosmeticItem = {
   id: 'backpack-explorer',
-  name: "Explorer's Pack",
   slot: 'backpack',
   rarity: 'rare',
   unlockRequirement: { type: 'streak', value: 7 },
@@ -28,7 +26,6 @@ const BACKPACK: CosmeticItem = {
 
 const AURA: CosmeticItem = {
   id: 'aura-glow',
-  name: 'Warm Glow',
   slot: 'aura',
   rarity: 'legendary',
   unlockRequirement: { type: 'xp', value: 2000 },
@@ -43,6 +40,32 @@ const VETERAN = { level: 20, totalXp: 5000, longestStreak: 30 }
 describe('SLOT_RENDER_ORDER', () => {
   it('paints back to front: aura, then backpack, then hat', () => {
     expect(SLOT_RENDER_ORDER).toEqual(['aura', 'backpack', 'hat'])
+  })
+})
+
+describe('COSMETIC_CATALOG', () => {
+  /**
+   * The whole point of the decoupling: an entry is an id plus the rules the
+   * domain actually reasons about. A display string here would be a sentence
+   * `domain/` cannot translate and the UI cannot override.
+   */
+  const CATALOG_FIELDS = ['assetRef', 'id', 'rarity', 'slot', 'unlockRequirement']
+
+  it('carries no display copy — every entry is ids and rules only', () => {
+    // Asserted first so the loop below cannot pass by iterating zero times.
+    expect(COSMETIC_CATALOG).toHaveLength(3)
+
+    for (const item of COSMETIC_CATALOG) {
+      expect(Object.keys(item).sort()).toEqual(CATALOG_FIELDS)
+    }
+  })
+
+  it('still exposes the stable ids every saved `EquippedItems` refers to', () => {
+    expect(COSMETIC_CATALOG.map((item) => item.id)).toEqual([
+      'hat-sprout',
+      'backpack-explorer',
+      'aura-glow',
+    ])
   })
 })
 

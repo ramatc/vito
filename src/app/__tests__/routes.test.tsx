@@ -314,6 +314,71 @@ describe('Closet', () => {
       screen.getByRole('img', { name: /wearing Explorer's Pack/ }),
     ).toBeInTheDocument()
   })
+
+  /**
+   * The one behaviour the decoupling exists for: names come from an id-keyed
+   * table outside `domain/`, so a language change repaints them without the
+   * catalog moving at all.
+   */
+  describe('language', () => {
+    it('renders the whole closet in Spanish, names included', async () => {
+      await boot(partlyEarned)
+      usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+      render(<App />)
+      await goTo('Ropero')
+
+      expect(
+        screen.getByRole('heading', { name: 'Ropero', level: 1 }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText('Vito lleva puesto Mochila de Explorador.'),
+      ).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Gorras' })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Gorra Brote/ })).toBeInTheDocument()
+      expect(screen.getByText('Tocá para ponerlo')).toBeInTheDocument()
+    })
+
+    it('translates a locked item down to its rarity and its threshold', async () => {
+      await boot(partlyEarned)
+      usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+      render(<App />)
+      await goTo('Ropero')
+      await userEvent.click(screen.getByRole('button', { name: 'Auras' }))
+
+      expect(screen.getByText('Brillo Cálido')).toBeInTheDocument()
+      expect(screen.getByText('Se desbloquea con 2000 XP')).toBeInTheDocument()
+      expect(screen.getByText('Legendaria')).toBeInTheDocument()
+    })
+
+    it('repaints the cosmetic names when the language changes mid-session', async () => {
+      await boot(partlyEarned)
+      render(<App />)
+
+      await goTo('Closet')
+
+      expect(screen.getByRole('button', { name: /Sprout Cap/ })).toBeInTheDocument()
+
+      await act(async () => {
+        await usePreferencesStore.getState().setLocale('es')
+      })
+
+      expect(screen.getByRole('button', { name: /Gorra Brote/ })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Sprout Cap/ })).not.toBeInTheDocument()
+    })
+
+    it('renames what Vito is wearing on the avatar too', async () => {
+      await boot(partlyEarned)
+      usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+      render(<App />)
+
+      expect(
+        screen.getByRole('img', { name: /con Mochila de Explorador puesto/ }),
+      ).toBeInTheDocument()
+    })
+  })
 })
 
 describe('Settings — reset progress', () => {
