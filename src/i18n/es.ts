@@ -11,6 +11,8 @@ export const ES: Dictionary = {
   'app.wordmark': 'Vito',
   'app.storageError':
     'Vito no puede guardar en este navegador ahora mismo, así que el progreso de hoy puede perderse. Fijate que los datos de sitio estén permitidos y que haya espacio.',
+  'app.error.title': 'Algo salió mal.',
+  'app.error.hint': 'Probá recargar la página.',
 
   'nav.today': 'Hoy',
   'nav.habits': 'Hábitos',
@@ -160,6 +162,21 @@ export const ES: Dictionary = {
 
   'vito.avatar.wearing': ', con {items} puesto',
 
+  'progress.section': 'Tu progreso',
+  'progress.level': 'Nivel {level}',
+  'progress.topLevel': 'Nivel máximo',
+  'progress.xpToLevel': '{current} / {total} XP para el nivel {level}',
+  'progress.momentum.label': 'Impulso',
+  'progress.momentum.caption':
+    'El impulso baja cuando todo se aquieta, y nunca se vacía.',
+  'progress.streak.current.one': 'Racha de {count} día',
+  'progress.streak.current.other': 'Racha de {count} días',
+  'progress.streak.none': 'Hoy puede ser el día uno',
   'progress.streak.best.one': 'Tu mejor marca: {count} día',
   'progress.streak.best.other': 'Tu mejor marca: {count} días',
+  'progress.streak.bestNone': 'Acá va a aparecer tu mejor marca',
+  'progress.boost.one':
+    'Bonus de bienvenida: el próximo hábito que completes suma XP extra.',
+  'progress.boost.other':
+    'Bonus de bienvenida: los próximos {count} hábitos que completes suman XP extra.',
 }
