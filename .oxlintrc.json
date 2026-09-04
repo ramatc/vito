@@ -428,6 +428,44 @@
       }
     },
     {
+      "files": [
+        "src/features/*/__tests__/*.test.ts",
+        "src/features/*/__tests__/*.test.tsx"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "*",
+                  "**",
+                  "!../*",
+                  "!../../*/*",
+                  "!../../../components/*/*",
+                  "!../../../hooks/*",
+                  "!../../../i18n/*",
+                  "!../../../stores/*",
+                  "!../../../domain/*/*",
+                  "!../../../types/*",
+                  "!../../../utils/*",
+                  "!react",
+                  "!react/*",
+                  "!react-router-dom",
+                  "!framer-motion",
+                  "!lucide-react",
+                  "!vitest",
+                  "!@testing-library/react"
+                ],
+                "message": "A feature test may import exactly what the module under test may import, plus the test runner and Testing Library."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/app/*"],
       "rules": {
         "no-restricted-imports": [
