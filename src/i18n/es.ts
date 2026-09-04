@@ -26,6 +26,7 @@ export const ES: Dictionary = {
   'common.dismiss': 'Descartar',
   'common.xp': '{count} XP',
   'common.xpGain': '+{count} XP',
+  'common.and': 'y',
   'common.error.save': 'No se pudo guardar, probá de nuevo.',
 
   'settings.language.label': 'Idioma',
@@ -110,6 +111,32 @@ export const ES: Dictionary = {
   'habits.toast.unlock': '{xp} — hay algo nuevo esperando en el ropero.',
   'habits.toast.comeback': '{xp} — bonus de bienvenida.',
   'habits.toast.undo': 'Desmarcado por hoy.',
+
+  'closet.title': 'Ropero',
+  'closet.description':
+    'Todo lo que Vito se ganó. Ponele lo que quieras: nada se gasta nunca.',
+  'closet.worn.none': 'Hoy Vito va como él mismo.',
+  'closet.worn.some': 'Vito lleva puesto {items}.',
+  'closet.worn.hint':
+    'Lo lleva puesto en la pantalla de Hoy. Cada espacio es independiente, así que una gorra nueva no le saca nada más.',
+  'closet.slots.label': 'Espacios de accesorios',
+  'closet.slot.hat': 'Gorras',
+  'closet.slot.backpack': 'Mochilas',
+  'closet.slot.aura': 'Auras',
+  'closet.rarity.common': 'Común',
+  'closet.rarity.rare': 'Rara',
+  'closet.rarity.legendary': 'Legendaria',
+  'closet.unlock.level': 'Se desbloquea en el nivel {value}',
+  'closet.unlock.xp': 'Se desbloquea con {value} XP',
+  'closet.unlock.streak': 'Se desbloquea con una racha de {value} días',
+  'closet.item.worn': 'Puesto — tocá para sacarlo',
+  'closet.item.wear': 'Tocá para ponerlo',
+
+  'cosmetic.hatSprout.name': 'Gorra Brote',
+  'cosmetic.backpackExplorer.name': 'Mochila de Explorador',
+  'cosmetic.auraGlow.name': 'Brillo Cálido',
+
+  'vito.avatar.wearing': ', con {items} puesto',
 
   'progress.streak.best.one': 'Tu mejor marca: {count} día',
   'progress.streak.best.other': 'Tu mejor marca: {count} días',
