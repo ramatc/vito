@@ -9,6 +9,8 @@ import type { Dictionary } from './keys'
  */
 export const ES: Dictionary = {
   'app.wordmark': 'Vito',
+  'app.storageError':
+    'Vito no puede guardar en este navegador ahora mismo, así que el progreso de hoy puede perderse. Fijate que los datos de sitio estén permitidos y que haya espacio.',
 
   'nav.today': 'Hoy',
   'nav.habits': 'Hábitos',
@@ -33,6 +35,26 @@ export const ES: Dictionary = {
   'settings.theme.label': 'Tema',
   'settings.theme.light': 'Claro',
   'settings.theme.dark': 'Oscuro',
+
+  'settings.title': 'Ajustes',
+  'settings.description': 'Tus datos se quedan en este dispositivo.',
+  'settings.storage.title': 'Dónde viven tus datos',
+  'settings.storage.body':
+    'Vito guarda todo en este navegador. No hay cuenta, no se sube nada y nadie más puede verlo.',
+  'settings.storage.caveat':
+    'La contracara: si borrás los datos de sitio de este navegador, o abrís Vito en otro, empezás de cero. Exportar y sincronizar no están en esta versión.',
+
+  'settings.reset.title': 'Empezar de nuevo',
+  'settings.reset.description':
+    'Borra tus hábitos, tu historial y todo lo que Vito ganó, y lo deja de nuevo en el día uno. Esto no se puede deshacer.',
+  'settings.reset.action': 'Reiniciar el progreso',
+  'settings.reset.pending': 'Empezando de nuevo…',
+  'settings.reset.done': 'Todo volvió al día uno.',
+  'settings.reset.confirm': 'Empezar de nuevo',
+  'settings.reset.confirmTitle': '¿Empezar de nuevo con Vito?',
+  'settings.reset.confirmMessage':
+    'Esto borra tus hábitos, tu historial de completados y todo lo que Vito ganó y desbloqueó. No hay copia en ningún otro lado, así que no se puede recuperar.',
+  'settings.reset.keep': 'Conservar mi progreso',
 
   'habits.title': 'Hábitos',
   'habits.description':

@@ -14,6 +14,11 @@
  */
 export const EN = {
   'app.wordmark': 'Vito',
+  // Rendered above the routes, so it survives navigation. It names the likely
+  // cause as well as the symptom, because "might not be saving" on its own
+  // leaves nothing to do about it.
+  'app.storageError':
+    "Vito can't save to this browser right now, so today's progress might not be kept. Check that site data is allowed and that storage isn't full.",
 
   'nav.today': 'Today',
   'nav.habits': 'Habits',
@@ -38,6 +43,30 @@ export const EN = {
   'settings.theme.label': 'Theme',
   'settings.theme.light': 'Light',
   'settings.theme.dark': 'Dark',
+
+  'settings.title': 'Settings',
+  'settings.description': 'Your data stays on this device.',
+  'settings.storage.title': 'Where your data lives',
+  'settings.storage.body':
+    'Vito keeps everything in this browser. There is no account, nothing is uploaded, and nobody else can see it.',
+  'settings.storage.caveat':
+    "The flip side: clearing this browser's site data, or opening Vito in another browser, starts from scratch. Export and sync are not in this version.",
+
+  'settings.reset.title': 'Start over',
+  'settings.reset.description':
+    'Clears your habits, your history and everything Vito has earned, and puts him back at day one. This one cannot be undone.',
+  'settings.reset.action': 'Reset progress',
+  'settings.reset.pending': 'Starting over…',
+  'settings.reset.done': 'Everything is back to day one.',
+  // Deliberately its own key rather than a reuse of `settings.reset.title`,
+  // even though both read "Start over" in English: this one is the label on the
+  // irreversible button, and a translator rewording the section heading must
+  // not be able to move it by accident.
+  'settings.reset.confirm': 'Start over',
+  'settings.reset.confirmTitle': 'Start Vito over?',
+  'settings.reset.confirmMessage':
+    'This clears your habits, your completion history, and everything Vito has earned and unlocked. There is no copy anywhere else, so it cannot be brought back.',
+  'settings.reset.keep': 'Keep my progress',
 
   'habits.title': 'Habits',
   'habits.description':
