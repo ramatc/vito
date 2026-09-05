@@ -19,6 +19,8 @@ export const EN = {
   // leaves nothing to do about it.
   'app.storageError':
     "Vito can't save to this browser right now, so today's progress might not be kept. Check that site data is allowed and that storage isn't full.",
+  'app.error.title': 'Something went wrong.',
+  'app.error.hint': 'Try reloading the page.',
 
   'nav.today': 'Today',
   'nav.habits': 'Habits',
@@ -175,6 +177,24 @@ export const EN = {
 
   'vito.avatar.wearing': ', wearing {items}',
 
+  'progress.section': 'Your progress',
+  'progress.level': 'Level {level}',
+  'progress.topLevel': 'Top level',
+  'progress.xpToLevel': '{current} / {total} XP to level {level}',
+  'progress.momentum.label': 'Momentum',
+  'progress.momentum.caption':
+    'Momentum dips when things go quiet, and it never empties.',
+  // English spells the streak the same way at every count; the pair exists for
+  // Spanish, where "1 día" and "3 días" are different words.
+  'progress.streak.current.one': '{count}-day streak',
+  'progress.streak.current.other': '{count}-day streak',
+  'progress.streak.none': 'Today can be day one',
   'progress.streak.best.one': 'Best so far: {count} day',
   'progress.streak.best.other': 'Best so far: {count} days',
+  'progress.streak.bestNone': 'Your best run shows up here',
+  // Each form is a whole sentence rather than one frame with a count slot: the
+  // singular reads "the next habit", and no {count} to drop in is the point.
+  'progress.boost.one': 'Welcome-back bonus: the next habit you complete earns extra XP.',
+  'progress.boost.other':
+    'Welcome-back bonus: the next {count} habits you complete earn extra XP.',
 } as const satisfies Record<string, string>
