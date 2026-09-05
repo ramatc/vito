@@ -191,7 +191,22 @@ export function VitoAvatar({
 
   return (
     <div
-      className={cn('flex h-40 w-full items-center justify-center', className)}
+      /*
+       * The whole drawing is dimmed and desaturated as one, rather than every
+       * shape being repainted shade by shade.
+       *
+       * This is the mechanical treatment the proposal caps this cycle at: the
+       * art is an acknowledged placeholder, and a hand-tuned dark palette for
+       * CSS shapes that are going to be replaced would be work thrown away. A
+       * filter on the frame also reaches the cosmetics for free, which is the
+       * part a per-shape pass would have missed — their sprites live in
+       * `features/rewards/`, not here. Re-raise if it reads poorly at 375px.
+       */
+      className={cn(
+        'flex h-40 w-full items-center justify-center',
+        'dark:brightness-90 dark:saturate-75',
+        className,
+      )}
       // One name for the whole drawing. Without it a screen reader gets a pile
       // of empty decorative spans and learns nothing.
       role="img"
@@ -210,7 +225,9 @@ export function VitoAvatar({
         />
         <div
           className={cn(
-            'relative rounded-[45%] shadow-sm ring-1 ring-black/5',
+            // The hairline is a shadow in light and a rim light in dark: black
+            // on a dark page draws nothing at all.
+            'relative rounded-[45%] shadow-sm ring-1 ring-black/5 dark:ring-white/10',
             look.frame,
             look.body,
           )}

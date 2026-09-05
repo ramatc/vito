@@ -45,11 +45,18 @@ export function HabitCard({
   const icon = createElement(resolveHabitIcon(habit.icon), { className: 'size-5' })
 
   return (
-    <Card className={cn('flex items-center gap-3 p-3', completed && 'bg-emerald-50/60')}>
+    <Card
+      className={cn(
+        'flex items-center gap-3 p-3',
+        completed && 'bg-emerald-50/60 dark:bg-emerald-500/10',
+      )}
+    >
       <span
         className={cn(
           'flex size-11 shrink-0 items-center justify-center rounded-xl',
-          completed ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500',
+          completed
+            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300'
+            : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300',
         )}
       >
         {icon}
@@ -59,12 +66,14 @@ export function HabitCard({
         <p
           className={cn(
             'truncate text-sm font-medium',
-            completed ? 'text-emerald-900' : 'text-slate-900',
+            completed
+              ? 'text-emerald-900 dark:text-emerald-200'
+              : 'text-slate-900 dark:text-primary',
           )}
         >
           {habit.name}
         </p>
-        <p className="truncate text-xs text-slate-500">
+        <p className="truncate text-xs text-slate-500 dark:text-muted">
           {habit.category} · {describeFrequency(locale, habit.frequency)} · {xpHint}
         </p>
       </div>
@@ -76,7 +85,7 @@ export function HabitCard({
           onClick={() => {
             onEdit(habit)
           }}
-          className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-200"
         >
           <Pencil className="size-4" />
         </button>
@@ -89,7 +98,7 @@ export function HabitCard({
           onClick={() => {
             onArchive(habit)
           }}
-          className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-200"
         >
           <Archive className="size-4" />
         </button>
@@ -112,8 +121,11 @@ export function HabitCard({
           'inline-flex size-11 shrink-0 items-center justify-center rounded-full ring-1 transition-colors',
           'disabled:cursor-not-allowed disabled:opacity-50',
           completed
-            ? 'bg-emerald-600 text-white ring-emerald-600'
-            : 'bg-white text-slate-300 ring-slate-300 hover:text-emerald-600 hover:ring-emerald-400',
+            ? // The filled state inverts its tick rather than keeping it white:
+              // `--brand` is a light mint in the dark theme, the same reason
+              // `Button`'s primary variant takes `--surface` for its lettering.
+              'bg-emerald-600 text-white ring-emerald-600 dark:bg-brand dark:text-surface dark:ring-brand'
+            : 'bg-white text-slate-300 ring-slate-300 hover:text-emerald-600 hover:ring-emerald-400 dark:bg-surface-raised dark:text-slate-600 dark:ring-slate-600 dark:hover:text-brand dark:hover:ring-brand',
         )}
       >
         <Check className="size-5" />

@@ -29,11 +29,11 @@ export function MoodBubble({ headline, body, className }: MoodBubbleProps) {
       {/* The tail, pointing back up at Vito. Decorative, so it stays unlabelled. */}
       <span
         aria-hidden="true"
-        className="absolute -top-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 rounded-sm bg-white ring-1 ring-slate-200"
+        className="absolute -top-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 rounded-sm bg-white ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700"
       />
-      <div className="relative rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
-        <p className="text-sm font-medium text-slate-900">{headline}</p>
-        <p className="mt-0.5 text-sm text-slate-600">{body}</p>
+      <div className="relative rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700">
+        <p className="text-sm font-medium text-slate-900 dark:text-primary">{headline}</p>
+        <p className="mt-0.5 text-sm text-slate-600 dark:text-muted">{body}</p>
       </div>
     </div>
   )

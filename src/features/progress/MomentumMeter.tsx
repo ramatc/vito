@@ -37,7 +37,7 @@ export function MomentumMeter({
         label={label}
         hint={`${String(momentum)} / ${String(MOMENTUM.MAX)}`}
       />
-      <p className="mt-1.5 text-xs text-slate-500">{caption}</p>
+      <p className="mt-1.5 text-xs text-slate-500 dark:text-muted">{caption}</p>
     </div>
   )
 }

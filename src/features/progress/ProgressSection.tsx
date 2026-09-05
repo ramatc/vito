@@ -100,7 +100,7 @@ export function ProgressSection() {
         />
 
         {boostActive && (
-          <p className="rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+          <p className="rounded-xl bg-emerald-50 px-3 py-2 text-xs text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-200">
             {tCount(
               locale,
               { one: 'progress.boost.one', other: 'progress.boost.other' },
