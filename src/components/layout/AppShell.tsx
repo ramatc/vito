@@ -44,11 +44,11 @@ export function AppShell({
   bottomNavLabel,
 }: AppShellProps) {
   return (
-    <div className="min-h-svh bg-slate-50 text-slate-900">
+    <div className="min-h-svh bg-slate-50 text-slate-900 dark:bg-surface dark:text-primary">
       <div className="mx-auto flex w-full max-w-5xl">
         <nav
           aria-label={sidebarNavLabel}
-          className="sticky top-0 hidden h-svh w-56 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4 md:flex"
+          className="sticky top-0 hidden h-svh w-56 shrink-0 flex-col gap-1 border-r border-slate-200 bg-white p-4 md:flex dark:border-slate-700 dark:bg-surface-raised"
         >
           <span className="px-3 pt-2 pb-4 text-lg font-semibold tracking-tight">
             {wordmark}
@@ -62,8 +62,8 @@ export function AppShell({
                 cn(
                   'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium',
                   isActive
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'text-slate-600 hover:bg-slate-50',
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-brand'
+                    : 'text-slate-600 hover:bg-slate-50 dark:text-muted dark:hover:bg-slate-700',
                 )
               }
             >

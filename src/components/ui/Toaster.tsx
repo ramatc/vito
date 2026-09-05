@@ -48,9 +48,13 @@ function Toast({ toast, dismissLabel, onDismiss }: ToastProps) {
     <div
       className={cn(
         'pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm shadow-lg',
+        // A toast reads as "floating above everything" by contrasting with the
+        // page, so both tones invert with the theme rather than darken. The
+        // informational tone in particular has to get LIGHTER: slate-900 on a
+        // slate-900 page is a message you cannot see.
         toast.tone === 'celebrate'
-          ? 'bg-emerald-600 text-white'
-          : 'bg-slate-900 text-white',
+          ? 'bg-emerald-600 text-white dark:bg-brand dark:text-surface'
+          : 'bg-slate-900 text-white dark:bg-slate-700 dark:text-primary',
       )}
     >
       <span className="flex-1">{toast.message}</span>

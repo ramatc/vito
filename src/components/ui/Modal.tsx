@@ -81,7 +81,9 @@ export function Modal({
         type="button"
         aria-hidden="true"
         tabIndex={-1}
-        className="absolute inset-0 h-full w-full cursor-default bg-slate-900/40"
+        // The scrim goes darker and more opaque in the dark theme: a 40% slate-900
+        // veil over a slate-900 page is not a veil, it is nothing.
+        className="absolute inset-0 h-full w-full cursor-default bg-slate-900/40 dark:bg-slate-950/70"
         onClick={onClose}
       />
       <div
@@ -94,15 +96,22 @@ export function Modal({
         className={cn(
           'relative z-10 flex max-h-[90svh] w-full flex-col rounded-t-3xl bg-white shadow-xl outline-none',
           'sm:max-w-lg sm:rounded-3xl',
+          'dark:bg-surface-raised',
         )}
       >
-        <header className="flex items-start justify-between gap-4 border-b border-slate-100 p-4">
+        <header className="flex items-start justify-between gap-4 border-b border-slate-100 p-4 dark:border-slate-700">
           <div>
-            <h2 id={titleId} className="text-base font-semibold text-slate-900">
+            <h2
+              id={titleId}
+              className="text-base font-semibold text-slate-900 dark:text-primary"
+            >
               {title}
             </h2>
             {description !== undefined && (
-              <p id={descriptionId} className="mt-1 text-sm text-slate-500">
+              <p
+                id={descriptionId}
+                className="mt-1 text-sm text-slate-500 dark:text-muted"
+              >
                 {description}
               </p>
             )}
@@ -111,7 +120,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="-m-1 inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="-m-1 inline-flex size-11 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-muted dark:hover:bg-slate-700 dark:hover:text-primary"
           >
             <X className="size-5" />
           </button>
@@ -120,7 +129,7 @@ export function Modal({
         <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
 
         {footer !== undefined && (
-          <footer className="flex justify-end gap-2 border-t border-slate-100 p-4">
+          <footer className="flex justify-end gap-2 border-t border-slate-100 p-4 dark:border-slate-700">
             {footer}
           </footer>
         )}
