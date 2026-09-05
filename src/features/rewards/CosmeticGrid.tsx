@@ -99,7 +99,7 @@ export function CosmeticGrid({
               key={item.id}
               className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700"
             >
-              <span className="opacity-40 grayscale">
+              <span className="opacity-40 grayscale dark:opacity-100">
                 <ItemPreview assetRef={item.assetRef} />
               </span>
               <span className="min-w-0">
