@@ -177,6 +177,14 @@ export const EN = {
 
   'vito.avatar.wearing': ', wearing {items}',
 
+  // Keyed by evolution stage rather than by a name for the look, because the
+  // stage number is the thing `EvolutionStage` actually is — a reworded sprite
+  // keeps its key, and adding a fifth bracket asks for exactly one new line.
+  'vito.stage.1': 'a small sprout',
+  'vito.stage.2': 'a growing sprout',
+  'vito.stage.3': 'a leafy companion',
+  'vito.stage.4': 'a fully grown companion',
+
   'progress.section': 'Your progress',
   'progress.level': 'Level {level}',
   'progress.topLevel': 'Top level',

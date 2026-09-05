@@ -32,35 +32,45 @@ interface StageLook {
   frame: string
   body: string
   sprout: string
-  description: string
+  /** Dictionary key for the stage, not the words — see the `as const` below. */
+  descriptionKey: string
 }
 
-const STAGE_LOOK: Record<EvolutionStage, StageLook> = {
+/*
+ * `as const satisfies` rather than a plain annotation, and that is load-bearing.
+ *
+ * This file sits at `features/<feature>/<dir>/<file>`, a depth the ring rule
+ * closes to `i18n/`, so it cannot name `TranslationKey`. `as const` keeps each
+ * `descriptionKey` at its literal type, which `t()` then checks against the real
+ * key union at the call site — a typo still fails `tsc -b`, with no import
+ * crossing the boundary. Same shape as the `Locale`/`Translate` pair below.
+ */
+const STAGE_LOOK = {
   1: {
     frame: 'size-20',
     body: 'bg-emerald-300',
     sprout: 'bg-emerald-500 h-3',
-    description: 'a small sprout',
+    descriptionKey: 'vito.stage.1',
   },
   2: {
     frame: 'size-24',
     body: 'bg-emerald-400',
     sprout: 'bg-emerald-600 h-4',
-    description: 'a growing sprout',
+    descriptionKey: 'vito.stage.2',
   },
   3: {
     frame: 'size-28',
     body: 'bg-teal-400',
     sprout: 'bg-teal-600 h-5',
-    description: 'a leafy companion',
+    descriptionKey: 'vito.stage.3',
   },
   4: {
     frame: 'size-32',
     body: 'bg-cyan-400',
     sprout: 'bg-cyan-600 h-6',
-    description: 'a fully grown companion',
+    descriptionKey: 'vito.stage.4',
   },
-}
+} as const satisfies Record<EvolutionStage, StageLook>
 
 /** Eyes shut when Vito is dozing or resting; open and bright otherwise. */
 function eyeClass(mood: Mood): string {
@@ -185,7 +195,7 @@ export function VitoAvatar({
       // One name for the whole drawing. Without it a screen reader gets a pile
       // of empty decorative spans and learns nothing.
       role="img"
-      aria-label={`Vito, ${look.description}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
+      aria-label={`Vito, ${t(look.descriptionKey)}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
         t,
         locale,
         layers.map((layer) => layer.itemId),
