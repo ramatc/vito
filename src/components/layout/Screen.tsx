@@ -18,9 +18,11 @@ export function Screen({ title, description, action, children }: ScreenProps) {
     <div className="flex flex-col gap-5 px-4 pt-6 sm:px-6">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900">{title}</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-primary">
+            {title}
+          </h1>
           {description !== undefined && (
-            <p className="mt-1 text-sm text-slate-500">{description}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-muted">{description}</p>
           )}
         </div>
         {action}

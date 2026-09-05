@@ -29,7 +29,7 @@ export function IconPicker({ options, value, onChange, label }: IconPickerProps)
 
   return (
     <div className="flex flex-col gap-2">
-      <span id={labelId} className="text-sm font-medium text-slate-700">
+      <span id={labelId} className="text-sm font-medium text-slate-700 dark:text-primary">
         {label}
       </span>
       <div
@@ -53,8 +53,8 @@ export function IconPicker({ options, value, onChange, label }: IconPickerProps)
               className={cn(
                 'flex size-11 items-center justify-center rounded-xl ring-1 transition-colors',
                 selected
-                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-400'
-                  : 'bg-white text-slate-500 ring-slate-200 hover:bg-slate-50',
+                  ? 'bg-emerald-50 text-emerald-700 ring-emerald-400 dark:bg-emerald-500/15 dark:text-brand dark:ring-brand'
+                  : 'bg-white text-slate-500 ring-slate-200 hover:bg-slate-50 dark:bg-surface-raised dark:text-muted dark:ring-slate-700 dark:hover:bg-slate-700',
               )}
             >
               <option.Icon className="size-5" />

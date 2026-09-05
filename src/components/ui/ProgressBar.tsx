@@ -23,8 +23,10 @@ export function ProgressBar({ value, label, hint, className }: ProgressBarProps)
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <div className="flex items-baseline justify-between gap-2 text-xs">
-        <span className="font-medium text-slate-700">{label}</span>
-        {hint !== undefined && <span className="text-slate-500">{hint}</span>}
+        <span className="font-medium text-slate-700 dark:text-primary">{label}</span>
+        {hint !== undefined && (
+          <span className="text-slate-500 dark:text-muted">{hint}</span>
+        )}
       </div>
       <div
         role="progressbar"
@@ -32,10 +34,10 @@ export function ProgressBar({ value, label, hint, className }: ProgressBarProps)
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={percent}
-        className="h-2 w-full overflow-hidden rounded-full bg-slate-200"
+        className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700"
       >
         <div
-          className="h-full rounded-full bg-emerald-500 transition-[width] duration-500"
+          className="h-full rounded-full bg-emerald-500 transition-[width] duration-500 dark:bg-brand"
           style={{ width: `${String(percent)}%` }}
         />
       </div>

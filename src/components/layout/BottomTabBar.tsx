@@ -26,6 +26,7 @@ export function BottomTabBar({ navLabels, navLabel, className }: BottomTabBarPro
       aria-label={navLabel}
       className={cn(
         'fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur',
+        'dark:border-slate-700 dark:bg-surface-raised/95',
         'pb-[env(safe-area-inset-bottom)]',
         className,
       )}
@@ -39,7 +40,9 @@ export function BottomTabBar({ navLabels, navLabel, className }: BottomTabBarPro
               className={({ isActive }) =>
                 cn(
                   'flex min-h-14 flex-col items-center justify-center gap-1 text-[11px] font-medium',
-                  isActive ? 'text-emerald-700' : 'text-slate-500',
+                  isActive
+                    ? 'text-emerald-700 dark:text-brand'
+                    : 'text-slate-500 dark:text-muted',
                 )
               }
             >
