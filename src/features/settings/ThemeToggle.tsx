@@ -38,7 +38,7 @@ export function ThemeToggle({ label }: ThemeToggleProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 id={labelId} className="text-sm font-medium text-slate-900">
+      <h2 id={labelId} className="text-sm font-medium text-slate-900 dark:text-primary">
         {label}
       </h2>
       <div role="group" aria-labelledby={labelId} className="flex gap-2">
@@ -56,9 +56,11 @@ export function ThemeToggle({ label }: ThemeToggleProps) {
               className={cn(
                 'min-h-11 shrink-0 rounded-xl px-4 text-sm font-medium transition-colors',
                 'focus-visible:outline-2 focus-visible:outline-offset-2',
+                // The same segmented button `SlotPicker` and `LanguageToggle`
+                // draw, down to the byte — see `SlotPicker`'s note.
                 selected
-                  ? 'bg-emerald-600 text-white focus-visible:outline-emerald-600'
-                  : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400',
+                  ? 'bg-emerald-600 text-white focus-visible:outline-emerald-600 dark:bg-brand dark:text-surface dark:focus-visible:outline-brand'
+                  : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400 dark:bg-surface-raised dark:text-muted dark:ring-slate-700 dark:hover:bg-slate-700 dark:focus-visible:outline-slate-500',
               )}
             >
               {t(THEME_LABEL_KEYS[option])}

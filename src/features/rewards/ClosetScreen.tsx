@@ -65,9 +65,11 @@ export function ClosetScreen() {
 
   return (
     <Screen title={t('closet.title')} description={t('closet.description')}>
-      <Card className="text-sm text-slate-600">
+      <Card className="text-sm text-slate-600 dark:text-muted">
         <p>{wornSummary(t, locale, equippedItems)}</p>
-        <p className="mt-1 text-xs text-slate-500">{t('closet.worn.hint')}</p>
+        <p className="mt-1 text-xs text-slate-500 dark:text-muted">
+          {t('closet.worn.hint')}
+        </p>
       </Card>
 
       <SlotPicker value={slot} onChange={setSlot} />

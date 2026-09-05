@@ -54,9 +54,12 @@ export function SlotPicker({ value, onChange, className }: SlotPickerProps) {
             className={cn(
               'min-h-11 shrink-0 rounded-xl px-4 text-sm font-medium transition-colors',
               'focus-visible:outline-2 focus-visible:outline-offset-2',
+              // Byte-identical to `Button`'s primary/secondary pairs, and to
+              // `LanguageToggle`/`ThemeToggle`, which copy this control: the
+              // three are the same segmented button and must not drift apart.
               selected
-                ? 'bg-emerald-600 text-white focus-visible:outline-emerald-600'
-                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400',
+                ? 'bg-emerald-600 text-white focus-visible:outline-emerald-600 dark:bg-brand dark:text-surface dark:focus-visible:outline-brand'
+                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400 dark:bg-surface-raised dark:text-muted dark:ring-slate-700 dark:hover:bg-slate-700 dark:focus-visible:outline-slate-500',
             )}
           >
             {t(entry.labelKey)}

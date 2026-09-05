@@ -162,6 +162,11 @@ export const ES: Dictionary = {
 
   'vito.avatar.wearing': ', con {items} puesto',
 
+  'vito.stage.1': 'un brote pequeño',
+  'vito.stage.2': 'un brote que crece',
+  'vito.stage.3': 'un compañero frondoso',
+  'vito.stage.4': 'un compañero ya crecido',
+
   'progress.section': 'Tu progreso',
   'progress.level': 'Nivel {level}',
   'progress.topLevel': 'Nivel máximo',

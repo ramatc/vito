@@ -20,7 +20,7 @@ export function VitoStage() {
   return (
     <section
       aria-label="Vito"
-      className="flex flex-col items-center gap-2 rounded-3xl bg-gradient-to-b from-emerald-50 to-white px-4 pt-2 pb-5 ring-1 ring-emerald-100"
+      className="flex flex-col items-center gap-2 rounded-3xl bg-gradient-to-b from-emerald-50 to-white px-4 pt-2 pb-5 ring-1 ring-emerald-100 dark:from-emerald-500/10 dark:to-surface-raised dark:ring-emerald-500/20"
     >
       <VitoAvatar stage={stage} mood={mood} allDone={allDone} equipped={equippedItems} />
       <MoodBubble headline={message.headline} body={message.body} />

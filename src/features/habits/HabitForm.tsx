@@ -114,7 +114,10 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
   return (
     <form className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
       <div className="flex flex-col gap-2">
-        <label htmlFor={nameId} className="text-sm font-medium text-slate-700">
+        <label
+          htmlFor={nameId}
+          className="text-sm font-medium text-slate-700 dark:text-primary"
+        >
           {t('habits.form.name')}
         </label>
         <input
@@ -125,10 +128,12 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
           }}
           placeholder={t('habits.form.namePlaceholder')}
           autoComplete="off"
-          className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
+          className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-surface-raised dark:text-primary dark:ring-slate-700 dark:focus:ring-brand"
         />
         {showErrors && missingName && (
-          <p className="text-xs text-rose-600">{t('habits.form.nameError')}</p>
+          <p className="text-xs text-rose-600 dark:text-rose-400">
+            {t('habits.form.nameError')}
+          </p>
         )}
       </div>
 
@@ -144,7 +149,10 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
       />
 
       <div className="flex flex-col gap-2">
-        <label htmlFor={categoryId} className="text-sm font-medium text-slate-700">
+        <label
+          htmlFor={categoryId}
+          className="text-sm font-medium text-slate-700 dark:text-primary"
+        >
           {t('habits.form.category')}
         </label>
         <input
@@ -156,7 +164,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
           }}
           placeholder={t(DEFAULT_CATEGORY_KEY)}
           autoComplete="off"
-          className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500"
+          className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-surface-raised dark:text-primary dark:ring-slate-700 dark:focus:ring-brand"
         />
         <datalist id={categoryListId}>
           {SUGGESTED_CATEGORY_KEYS.map((key) => (
@@ -166,7 +174,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium text-slate-700">
+        <legend className="mb-2 text-sm font-medium text-slate-700 dark:text-primary">
           {t('habits.form.repeats')}
         </legend>
         <div className="flex gap-2">
@@ -214,8 +222,8 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
                     className={cn(
                       'size-11 flex-1 rounded-xl text-sm font-medium ring-1 transition-colors',
                       selected
-                        ? 'bg-emerald-600 text-white ring-emerald-600'
-                        : 'bg-white text-slate-600 ring-slate-200 hover:bg-slate-50',
+                        ? 'bg-emerald-600 text-white ring-emerald-600 dark:bg-brand dark:text-surface dark:ring-brand'
+                        : 'bg-white text-slate-600 ring-slate-200 hover:bg-slate-50 dark:bg-surface-raised dark:text-muted dark:ring-slate-700 dark:hover:bg-slate-700',
                     )}
                   >
                     {option.short}
@@ -224,7 +232,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
               })}
             </div>
             {missingDays && (
-              <p id={weekdayErrorId} className="text-xs text-slate-500">
+              <p id={weekdayErrorId} className="text-xs text-slate-500 dark:text-muted">
                 {t('habits.form.daysError')}
               </p>
             )}
@@ -233,7 +241,7 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
       </fieldset>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="mb-2 text-sm font-medium text-slate-700">
+        <legend className="mb-2 text-sm font-medium text-slate-700 dark:text-primary">
           {t('habits.form.difficulty')}
         </legend>
         <div className="flex gap-2">
@@ -264,7 +272,12 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
                 <span
                   className={cn(
                     'text-[11px]',
-                    selected ? 'text-emerald-50' : 'text-slate-500',
+                    // The selected hint rides on the filled button, which
+                    // inverts in the dark theme — so its XP tint has to invert
+                    // with it rather than stay a pale emerald on light mint.
+                    selected
+                      ? 'text-emerald-50 dark:text-surface/75'
+                      : 'text-slate-500 dark:text-muted',
                   )}
                 >
                   {xp}

@@ -25,7 +25,7 @@ export function TodayHabits() {
   return (
     <section className="flex flex-col gap-3" aria-label={t('habits.today.label')}>
       {scheduledCount > 0 && (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-slate-500 dark:text-muted">
           {t('habits.today.progress', {
             completed: completedCount,
             scheduled: scheduledCount,
@@ -34,7 +34,7 @@ export function TodayHabits() {
       )}
 
       {allDone && (
-        <Card className="bg-emerald-50 text-sm text-emerald-800 ring-emerald-200">
+        <Card className="bg-emerald-50 text-sm text-emerald-800 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-200 dark:ring-emerald-500/30">
           {t('habits.today.allDone')}
         </Card>
       )}
@@ -45,17 +45,17 @@ export function TodayHabits() {
         onToggle={onToggle}
         busyHabitIds={pendingHabitIds}
         empty={
-          <Card className="flex flex-col items-start gap-2 text-sm text-slate-600">
+          <Card className="flex flex-col items-start gap-2 text-sm text-slate-600 dark:text-muted">
             {restDay ? (
               <>
-                <span className="font-medium text-slate-900">
+                <span className="font-medium text-slate-900 dark:text-primary">
                   {t('habits.today.restTitle')}
                 </span>
                 <span>{t('habits.today.restDescription')}</span>
               </>
             ) : (
               <>
-                <span className="font-medium text-slate-900">
+                <span className="font-medium text-slate-900 dark:text-primary">
                   {t('habits.empty.title')}
                 </span>
                 <span>{t('habits.today.emptyDescription')}</span>
@@ -63,7 +63,7 @@ export function TodayHabits() {
             )}
             <Link
               to="/habits"
-              className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 hover:text-emerald-800"
+              className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 dark:text-brand dark:hover:text-emerald-300"
             >
               {t('habits.today.goToHabits')}
             </Link>

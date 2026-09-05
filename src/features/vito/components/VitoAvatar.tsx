@@ -32,35 +32,45 @@ interface StageLook {
   frame: string
   body: string
   sprout: string
-  description: string
+  /** Dictionary key for the stage, not the words — see the `as const` below. */
+  descriptionKey: string
 }
 
-const STAGE_LOOK: Record<EvolutionStage, StageLook> = {
+/*
+ * `as const satisfies` rather than a plain annotation, and that is load-bearing.
+ *
+ * This file sits at `features/<feature>/<dir>/<file>`, a depth the ring rule
+ * closes to `i18n/`, so it cannot name `TranslationKey`. `as const` keeps each
+ * `descriptionKey` at its literal type, which `t()` then checks against the real
+ * key union at the call site — a typo still fails `tsc -b`, with no import
+ * crossing the boundary. Same shape as the `Locale`/`Translate` pair below.
+ */
+const STAGE_LOOK = {
   1: {
     frame: 'size-20',
     body: 'bg-emerald-300',
     sprout: 'bg-emerald-500 h-3',
-    description: 'a small sprout',
+    descriptionKey: 'vito.stage.1',
   },
   2: {
     frame: 'size-24',
     body: 'bg-emerald-400',
     sprout: 'bg-emerald-600 h-4',
-    description: 'a growing sprout',
+    descriptionKey: 'vito.stage.2',
   },
   3: {
     frame: 'size-28',
     body: 'bg-teal-400',
     sprout: 'bg-teal-600 h-5',
-    description: 'a leafy companion',
+    descriptionKey: 'vito.stage.3',
   },
   4: {
     frame: 'size-32',
     body: 'bg-cyan-400',
     sprout: 'bg-cyan-600 h-6',
-    description: 'a fully grown companion',
+    descriptionKey: 'vito.stage.4',
   },
-}
+} as const satisfies Record<EvolutionStage, StageLook>
 
 /** Eyes shut when Vito is dozing or resting; open and bright otherwise. */
 function eyeClass(mood: Mood): string {
@@ -181,11 +191,26 @@ export function VitoAvatar({
 
   return (
     <div
-      className={cn('flex h-40 w-full items-center justify-center', className)}
+      /*
+       * The whole drawing is dimmed and desaturated as one, rather than every
+       * shape being repainted shade by shade.
+       *
+       * This is the mechanical treatment the proposal caps this cycle at: the
+       * art is an acknowledged placeholder, and a hand-tuned dark palette for
+       * CSS shapes that are going to be replaced would be work thrown away. A
+       * filter on the frame also reaches the cosmetics for free, which is the
+       * part a per-shape pass would have missed — their sprites live in
+       * `features/rewards/`, not here. Re-raise if it reads poorly at 375px.
+       */
+      className={cn(
+        'flex h-40 w-full items-center justify-center',
+        'dark:brightness-90 dark:saturate-75',
+        className,
+      )}
       // One name for the whole drawing. Without it a screen reader gets a pile
       // of empty decorative spans and learns nothing.
       role="img"
-      aria-label={`Vito, ${look.description}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
+      aria-label={`Vito, ${t(look.descriptionKey)}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
         t,
         locale,
         layers.map((layer) => layer.itemId),
@@ -200,7 +225,9 @@ export function VitoAvatar({
         />
         <div
           className={cn(
-            'relative rounded-[45%] shadow-sm ring-1 ring-black/5',
+            // The hairline is a shadow in light and a rim light in dark: black
+            // on a dark page draws nothing at all.
+            'relative rounded-[45%] shadow-sm ring-1 ring-black/5 dark:ring-white/10',
             look.frame,
             look.body,
           )}

@@ -701,6 +701,47 @@ describe('the worst state Vito can be in', () => {
 })
 
 /**
+ * Vito's own description, driven from Home the way a user meets it.
+ *
+ * The stage table is exercised stage by stage in the component's own suite; what
+ * only the real app can show is that the description is a live subscription like
+ * every other string, so switching the language repaints the avatar's accessible
+ * name without a reload.
+ */
+describe("Vito's stage description in the active language", () => {
+  it('describes a fresh companion in Spanish', async () => {
+    await boot()
+    usePreferencesStore.setState({ preferences: { locale: 'es', theme: 'light' } })
+
+    render(<App />)
+
+    expect(
+      screen.getByRole('img', { name: /^Vito, un brote pequeño,/ }),
+    ).toBeInTheDocument()
+  })
+
+  it('repaints the description when the language changes mid-session', async () => {
+    await boot()
+    render(<App />)
+
+    expect(
+      screen.getByRole('img', { name: /^Vito, a small sprout,/ }),
+    ).toBeInTheDocument()
+
+    await act(async () => {
+      await usePreferencesStore.getState().setLocale('es')
+    })
+
+    expect(
+      screen.getByRole('img', { name: /^Vito, un brote pequeño,/ }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('img', { name: /^Vito, a small sprout,/ }),
+    ).not.toBeInTheDocument()
+  })
+})
+
+/**
  * The progress ring, driven from Home the way a user meets it.
  *
  * This ring is the one place in the app where the copy is not a lookup but a
