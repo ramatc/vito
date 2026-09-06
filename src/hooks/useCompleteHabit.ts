@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { todayKey } from '../domain/shared/date'
 import type { CompletionOutcome } from '../stores/habitStore'
 import { useHabitStore } from '../stores/habitStore'
@@ -16,6 +16,14 @@ import { useTranslate } from './useTranslate'
  */
 
 type Translate = ReturnType<typeof useTranslate>
+
+/**
+ * A mis-tap undo immediately followed by re-checking the same habit is one
+ * user gesture, not two completions — the XP round trip is real (revoked,
+ * then re-awarded), but celebrating it twice reads as a glitch. Past this
+ * window, a recheck is a deliberate new completion and earns its toast.
+ */
+const RECENT_UNDO_WINDOW_MS = 4000
 
 /** One reaction per completion, most significant event first. */
 function reactionFor(outcome: CompletionOutcome): ReactionType {
@@ -77,6 +85,10 @@ export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActi
   // state for disabling a control, not something any other reader needs.
   const [pending, setPending] = useState<ReadonlySet<string>>(() => new Set())
 
+  // Ref, not state: a re-render on undo would be wasted work — only `complete`
+  // ever reads this, right after the fact.
+  const recentUndosRef = useRef<Map<string, number>>(new Map())
+
   const markPending = useCallback((habitId: string) => {
     setPending((current) => new Set(current).add(habitId))
   }, [])
@@ -105,9 +117,17 @@ export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActi
           return null
         }
 
-        const ui = useUiStore.getState()
-        ui.emitReaction(reactionFor(outcome))
-        ui.pushToast({ message: messageFor(t, outcome), tone: 'celebrate' })
+        const lastUndoAt = recentUndosRef.current.get(habitId)
+        const isUndoRecheck =
+          lastUndoAt !== undefined && Date.now() - lastUndoAt < RECENT_UNDO_WINDOW_MS
+
+        if (isUndoRecheck) {
+          recentUndosRef.current.delete(habitId)
+        } else {
+          const ui = useUiStore.getState()
+          ui.emitReaction(reactionFor(outcome))
+          ui.pushToast({ message: messageFor(t, outcome), tone: 'celebrate' })
+        }
 
         return outcome
       } catch {
@@ -127,6 +147,7 @@ export function useCompleteHabit(today: DateKey = todayKey()): CompleteHabitActi
 
       try {
         await useHabitStore.getState().undoCompletion(habitId, today)
+        recentUndosRef.current.set(habitId, Date.now())
         useUiStore.getState().pushToast({ message: t('habits.toast.undo'), tone: 'info' })
       } catch {
         useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
