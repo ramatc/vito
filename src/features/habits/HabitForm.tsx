@@ -1,3 +1,4 @@
+import { ChevronDown } from 'lucide-react'
 import type { FormEvent } from 'react'
 import { useId, useMemo, useState } from 'react'
 import { Button } from '../../components/ui/Button'
@@ -49,7 +50,6 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
 
   const nameId = useId()
   const categoryId = useId()
-  const categoryListId = useId()
   const weekdayErrorId = useId()
 
   const [name, setName] = useState(habit?.name ?? '')
@@ -155,22 +155,26 @@ export function HabitForm({ habit, onSubmit, onCancel, submitLabel }: HabitFormP
         >
           {t('habits.form.category')}
         </label>
-        <input
-          id={categoryId}
-          list={categoryListId}
-          value={category}
-          onChange={(event) => {
-            setCategory(event.target.value)
-          }}
-          placeholder={t(DEFAULT_CATEGORY_KEY)}
-          autoComplete="off"
-          className="min-h-11 rounded-xl px-3 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-surface-raised dark:text-primary dark:ring-slate-700 dark:focus:ring-brand"
-        />
-        <datalist id={categoryListId}>
-          {SUGGESTED_CATEGORY_KEYS.map((key) => (
-            <option key={key} value={t(key)} />
-          ))}
-        </datalist>
+        <div className="relative">
+          <select
+            id={categoryId}
+            value={category}
+            onChange={(event) => {
+              setCategory(event.target.value)
+            }}
+            className="min-h-11 w-full appearance-none rounded-xl px-3 pr-9 text-sm ring-1 ring-slate-200 outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-surface-raised dark:text-primary dark:ring-slate-700 dark:focus:ring-brand"
+          >
+            {SUGGESTED_CATEGORY_KEYS.map((key) => (
+              <option key={key} value={t(key)}>
+                {t(key)}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-slate-400 dark:text-slate-500"
+          />
+        </div>
       </div>
 
       <fieldset className="flex flex-col gap-2">
