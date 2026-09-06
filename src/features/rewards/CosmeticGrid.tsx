@@ -4,8 +4,8 @@ import type { TranslationKey } from '../../i18n/keys'
 import { usePreferencesStore } from '../../stores/preferencesStore'
 import type { CosmeticItem } from '../../types/models'
 import { cn } from '../../utils/cn'
-import { COSMETIC_ASSETS } from './cosmeticAssets'
 import { cosmeticName } from './cosmeticCopy'
+import { COSMETIC_PREVIEW_IMAGES } from './cosmeticPreviewImages'
 
 type Translate = ReturnType<typeof useTranslate>
 
@@ -48,22 +48,20 @@ function unlockLabel(t: Translate, item: CosmeticItem): string {
 }
 
 /**
- * The item drawn the way it will actually look: over a stand-in for Vito's
- * body, so a hat reads as a hat rather than as two floating rectangles.
- *
- * The dark filter is the same mechanical treatment `VitoAvatar` puts on its own
- * frame, applied here because this is the other place the sprites are drawn and
- * the avatar's filter cannot reach it. It lands once per drawing rather than in
- * `cosmeticSprites.tsx`, which both call sites render — a filter there would
- * compound with the avatar's and leave the worn item darker than the tile it
- * came from.
+ * The item on its own, the way the closet lists it — unlike `VitoAvatar`,
+ * which draws the same cosmetic positioned against Vito's frame, this tile
+ * has no body to hang a hat or backpack off of. Its artwork
+ * (`cosmeticPreviewImages.ts`) is a self-contained icon with its own margin
+ * baked in, so it is never clipped or rescaled here.
  */
 function ItemPreview({ assetRef }: { assetRef: string }) {
-  const Asset = COSMETIC_ASSETS[assetRef]
+  const previewSrc = COSMETIC_PREVIEW_IMAGES[assetRef]
 
   return (
-    <span className="relative size-12 shrink-0 rounded-[45%] bg-emerald-200/70 dark:bg-emerald-500/25 dark:brightness-90 dark:saturate-75">
-      {Asset !== undefined && <Asset />}
+    <span className="flex size-12 shrink-0 items-center justify-center rounded-[45%] bg-emerald-200/70 dark:bg-emerald-500/25 dark:brightness-90 dark:saturate-75">
+      {previewSrc !== undefined && (
+        <img src={previewSrc} alt="" className="size-9 object-contain" />
+      )}
     </span>
   )
 }
