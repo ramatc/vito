@@ -185,6 +185,31 @@ export const EN = {
   'vito.stage.3': 'a leafy companion',
   'vito.stage.4': 'a fully grown companion',
 
+  // What Vito says in the mood bubble, keyed by mood, plus the two states
+  // that outrank a mood outright (see `moodMessage`'s priority order). The
+  // `.alt` entries are the same moment described for a screen reader, read by
+  // `VitoAvatar`'s single `aria-label` rather than the bubble.
+  'vito.mood.thriving.headline': 'Vito is glowing',
+  'vito.mood.thriving.body': 'Everything lined up today. Enjoy how that feels.',
+  'vito.mood.thriving.alt': 'beaming',
+  'vito.mood.happy.headline': 'Vito is happy',
+  'vito.mood.happy.body': 'You showed up. That is the entire trick, repeated.',
+  'vito.mood.happy.alt': 'smiling',
+  'vito.mood.content.headline': 'Vito is settled',
+  'vito.mood.content.body': 'Nothing urgent here. Pick one habit whenever you are ready.',
+  'vito.mood.content.alt': 'calm',
+  'vito.mood.sleepy.headline': 'Vito is dozing',
+  'vito.mood.sleepy.body': 'Things have been quiet. One small habit is enough to stir him.',
+  'vito.mood.sleepy.alt': 'dozing',
+  'vito.mood.resting.headline': 'Vito is resting',
+  'vito.mood.resting.body': 'He has been taking it easy, and he is ready whenever you are.',
+  'vito.mood.resting.alt': 'resting with his eyes closed',
+  'vito.mood.allDone.headline': 'Vito is delighted',
+  'vito.mood.allDone.body': 'That is everything scheduled for today. The rest of it is yours.',
+  'vito.mood.comeback.headline': 'Vito is glad you are back',
+  'vito.mood.comeback.body':
+    'Your next few habits are worth extra XP. No catching up required.',
+
   'progress.section': 'Your progress',
   'progress.level': 'Level {level}',
   'progress.topLevel': 'Top level',

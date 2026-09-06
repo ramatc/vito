@@ -1,5 +1,6 @@
 import { useProgress } from '../../../hooks/useProgress'
 import { useVito } from '../../../hooks/useVito'
+import { usePreferencesStore } from '../../../stores/preferencesStore'
 import { moodMessage } from '../copy/moodMessages'
 import { MoodBubble } from './MoodBubble'
 import { VitoAvatar } from './VitoAvatar'
@@ -15,7 +16,8 @@ import { VitoAvatar } from './VitoAvatar'
 export function VitoStage() {
   const { mood, stage, allDone, equippedItems } = useVito()
   const { boostActive } = useProgress()
-  const message = moodMessage({ mood, allDone, boosted: boostActive })
+  const locale = usePreferencesStore((state) => state.preferences.locale)
+  const message = moodMessage(locale, { mood, allDone, boosted: boostActive })
 
   return (
     <section

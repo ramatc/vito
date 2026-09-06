@@ -12,7 +12,7 @@ import { cn } from '../../../utils/cn'
 import { COSMETIC_ASSETS } from '../../rewards/cosmeticAssets'
 import { cosmeticName } from '../../rewards/cosmeticCopy'
 import { idleStateFor, reducedVitoVariants, vitoVariants } from '../animation/variants'
-import { MOOD_ALT_TEXT } from '../copy/moodMessages'
+import { moodAltText } from '../copy/moodMessages'
 
 /**
  * Vito himself.
@@ -210,7 +210,7 @@ export function VitoAvatar({
       // One name for the whole drawing. Without it a screen reader gets a pile
       // of empty decorative spans and learns nothing.
       role="img"
-      aria-label={`Vito, ${t(look.descriptionKey)}, ${MOOD_ALT_TEXT[mood]}${wornDescription(
+      aria-label={`Vito, ${t(look.descriptionKey)}, ${moodAltText(locale, mood)}${wornDescription(
         t,
         locale,
         layers.map((layer) => layer.itemId),
