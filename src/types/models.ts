@@ -16,7 +16,7 @@ export type DateKey = string
 
 export type Difficulty = 'easy' | 'normal' | 'hard'
 
-export type CosmeticSlot = 'hat' | 'backpack' | 'aura'
+export type CosmeticSlot = 'hat' | 'backpack' | 'aura' | 'outfit' | 'effects'
 
 /**
  * Slot -> `CosmeticItem` id. Partial by design: adding a new slot to
