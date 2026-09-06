@@ -335,6 +335,7 @@
                   "*",
                   "**",
                   "!./*",
+                  "!./*/*",
                   "!../*/*",
                   "!../../components/*/*",
                   "!../../hooks/*",
@@ -349,7 +350,7 @@
                   "!framer-motion",
                   "!lucide-react"
                 ],
-                "message": "features/ composes the UI: it may import React, the router, motion and icon libraries, components/, hooks/, stores/, domain/, i18n/, types/ and utils/. No services/storage — persistence is reached through a store, never directly."
+                "message": "features/ composes the UI: it may import React, the router, motion and icon libraries, components/, hooks/, stores/, domain/, i18n/, types/ and utils/, and its own subdirectories (e.g. ./assets/**). No services/storage — persistence is reached through a store, never directly."
               }
             ]
           }
@@ -372,6 +373,7 @@
                   "!../../*/*",
                   "!../../../components/*/*",
                   "!../../../hooks/*",
+                  "!../../../i18n/*",
                   "!../../../stores/*",
                   "!../../../domain/*/*",
                   "!../../../types/*",
@@ -382,7 +384,7 @@
                   "!framer-motion",
                   "!lucide-react"
                 ],
-                "message": "A nested feature directory (features/<feature>/<dir>/<file>) gets exactly what features/<feature>/<file> gets, one level deeper: its own directory, its feature's other directories, other features' top-level files, components/, hooks/, stores/, domain/, types/ and utils/. Still no services/storage."
+                "message": "A nested feature directory (features/<feature>/<dir>/<file>) gets exactly what features/<feature>/<file> gets, one level deeper: its own directory, its feature's other directories, other features' top-level files, components/, hooks/, stores/, domain/, i18n/, types/ and utils/. Still no services/storage."
               }
             ]
           }
