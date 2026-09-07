@@ -1,16 +1,18 @@
 import { cn } from '../../../utils/cn'
 
 /**
- * What Vito is saying, in a speech bubble with a tail.
+ * What Vito is saying, read as part of him rather than a reply from a
+ * separate surface.
  *
  * Presentational on purpose: the copy arrives as props from
  * `features/vito/copy/moodMessages`, which is the one file where the product's
  * voice gets reviewed.
  *
- * The bubble is a polite live region. Completing a habit changes what Vito says
- * — often the most human feedback in the app — and without this a screen reader
- * hears only the XP toast. Polite, never assertive: a mood is worth mentioning
- * when the user next pauses, never worth cutting them off mid-sentence.
+ * A polite live region, not a card. Completing a habit changes what Vito says
+ * — often the most human feedback in the app — and without this a screen
+ * reader hears only the XP toast. Polite, never assertive: a mood is worth
+ * mentioning when the user next pauses, never worth cutting them off
+ * mid-sentence.
  */
 
 export interface MoodBubbleProps {
@@ -24,17 +26,10 @@ export function MoodBubble({ headline, body, className }: MoodBubbleProps) {
     <div
       role="status"
       aria-live="polite"
-      className={cn('relative max-w-xs text-center', className)}
+      className={cn('flex max-w-xs flex-col items-center gap-1 text-center', className)}
     >
-      {/* The tail, pointing back up at Vito. Decorative, so it stays unlabelled. */}
-      <span
-        aria-hidden="true"
-        className="absolute -top-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45 rounded-sm bg-white ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700"
-      />
-      <div className="relative rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700">
-        <p className="text-sm font-medium text-slate-900 dark:text-primary">{headline}</p>
-        <p className="mt-0.5 text-sm text-slate-600 dark:text-muted">{body}</p>
-      </div>
+      <p className="text-base font-semibold text-slate-900 dark:text-primary">{headline}</p>
+      <p className="text-sm leading-relaxed text-slate-600 dark:text-muted">{body}</p>
     </div>
   )
 }

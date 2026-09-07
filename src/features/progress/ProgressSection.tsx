@@ -71,27 +71,31 @@ export function ProgressSection() {
 
   return (
     <section aria-label={t('progress.section')}>
-      <Card className="flex flex-col gap-4">
-        <XpBar
-          levelProgress={levelProgress}
-          label={t('progress.level', { level })}
-          hint={
-            isMaxLevel
-              ? t('progress.topLevel')
-              : t('progress.xpToLevel', {
-                  current: xpIntoLevel,
-                  total: xpForLevel,
-                  level: level + 1,
-                })
-          }
-        />
+      <Card className="flex flex-col gap-5">
+        {/* XP and momentum read as one "progress" cluster — tighter internal
+            gap than the streak/boost rows below, which are their own things. */}
+        <div className="flex flex-col gap-3">
+          <XpBar
+            levelProgress={levelProgress}
+            label={t('progress.level', { level })}
+            hint={
+              isMaxLevel
+                ? t('progress.topLevel')
+                : t('progress.xpToLevel', {
+                    current: xpIntoLevel,
+                    total: xpForLevel,
+                    level: level + 1,
+                  })
+            }
+          />
 
-        <MomentumMeter
-          momentum={momentum}
-          fraction={momentumFraction}
-          label={t('progress.momentum.label')}
-          caption={t('progress.momentum.caption')}
-        />
+          <MomentumMeter
+            momentum={momentum}
+            fraction={momentumFraction}
+            label={t('progress.momentum.label')}
+            caption={t('progress.momentum.caption')}
+          />
+        </div>
 
         <StreakBadge
           hasStreak={currentStreak > 0}
