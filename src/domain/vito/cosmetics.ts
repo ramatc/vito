@@ -8,8 +8,17 @@ import type { CosmeticItem, CosmeticSlot, EquippedItems } from '../../types/mode
  * consults it.
  */
 
-/** Back to front. The base evolution sprite sits behind all of these, at z 0. */
+/** Back to front, among cosmetics. Whether a slot sits behind or in front of the body itself is `BEHIND_BODY_SLOT_COUNT`, below. */
 export const SLOT_RENDER_ORDER: readonly CosmeticSlot[] = ['aura', 'backpack', 'hat']
+
+/**
+ * How many leading slots in `SLOT_RENDER_ORDER` render behind the body and
+ * face rather than on top of them: an aura should surround Vito and a
+ * backpack should tuck behind his back, but a hat sits on the head. Grow
+ * this (and reorder `SLOT_RENDER_ORDER`) if a future slot also needs to sit
+ * behind the body — nothing else about `resolveLayers` has to change.
+ */
+const BEHIND_BODY_SLOT_COUNT = 2
 
 export interface CosmeticLayer {
   slot: CosmeticSlot
@@ -33,6 +42,15 @@ export interface UnlockProgress {
  * position in the returned array, so a hat keeps its depth whether or not an
  * aura is equipped behind it.
  *
+ * A negative `z` puts a slot behind the body and face sprites; a positive one
+ * puts it in front. This works because `VitoAvatar` never gives body/face a
+ * z-index of their own — CSS places that `z-index: auto` pair strictly
+ * between any negative and any positive sibling by spec (CSS2.1 §E: negative
+ * stack levels paint before the auto/positioned-at-0 group, positive ones
+ * after), so the boundary is guaranteed without VitoAvatar having to know
+ * which slots are which. `BEHIND_BODY_SLOT_COUNT` is the only thing that
+ * decides which side of that line a slot falls on.
+ *
  * An id that is missing from the catalog, or saved into the wrong slot, is
  * skipped rather than thrown on: saved data outlives catalog edits.
  */
@@ -53,7 +71,12 @@ export function resolveLayers(
       return []
     }
 
-    return [{ slot, itemId, assetRef: item.assetRef, z: index + 1 }]
+    const z =
+      index < BEHIND_BODY_SLOT_COUNT
+        ? index - BEHIND_BODY_SLOT_COUNT
+        : index - BEHIND_BODY_SLOT_COUNT + 1
+
+    return [{ slot, itemId, assetRef: item.assetRef, z }]
   })
 }
 

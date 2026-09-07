@@ -168,6 +168,13 @@ export function VitoAvatar({
       )}`}
     >
       <motion.div animate={controls} className="relative aspect-square w-48 sm:w-56 md:w-64">
+        {/*
+          Body and face are deliberately given no z-index. That absence is
+          load-bearing: it is what lets a cosmetic layer's `z` (see
+          `resolveLayers`) place a slot behind them with a negative value or
+          in front with a positive one, without this component having to know
+          which slot is which.
+        */}
         <img
           src={BODY_ASSETS[visualState.pose]}
           alt=""

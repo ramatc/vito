@@ -78,7 +78,7 @@ describe('resolveLayers', () => {
 
   it('resolves a single equipped item into a layer carrying its asset key', () => {
     expect(resolveLayers({ hat: 'hat-sprout' }, CATALOG)).toEqual([
-      { slot: 'hat', itemId: 'hat-sprout', assetRef: 'hat-sprout', z: 3 },
+      { slot: 'hat', itemId: 'hat-sprout', assetRef: 'hat-sprout', z: 1 },
     ])
   })
 
@@ -96,24 +96,38 @@ describe('resolveLayers', () => {
     ])
   })
 
-  it('gives every layer a z above the base sprite, increasing front to back', () => {
+  it('gives aura and backpack a negative z (behind body) and hat a positive one (in front), increasing front to back', () => {
     const layers = resolveLayers(
       { hat: 'hat-sprout', aura: 'aura-glow', backpack: 'backpack-explorer' },
       CATALOG,
     )
 
-    expect(layers.map((layer) => layer.z)).toEqual([1, 2, 3])
+    expect(layers.map((layer) => layer.z)).toEqual([-2, -1, 1])
+  })
+
+  it('keeps aura and backpack behind the body sprite (negative z) and hat in front of it (positive z)', () => {
+    const layers = resolveLayers(
+      { hat: 'hat-sprout', aura: 'aura-glow', backpack: 'backpack-explorer' },
+      CATALOG,
+    )
+    const zBySlot = Object.fromEntries(layers.map((layer) => [layer.slot, layer.z]))
+
+    // Body and face render at CSS's implicit z-index:auto — see the comment
+    // on `resolveLayers` for why negative/positive is what pins each side.
+    expect(zBySlot.aura).toBeLessThan(0)
+    expect(zBySlot.backpack).toBeLessThan(0)
+    expect(zBySlot.hat).toBeGreaterThan(0)
   })
 
   it('keeps a slot z stable when the slots behind it are empty', () => {
-    // The hat must not slide down to z 1 just because the aura is off; the base
-    // sprite owns z 0 and each slot owns a fixed depth.
-    expect(resolveLayers({ hat: 'hat-sprout' }, CATALOG)[0].z).toBe(3)
+    // The hat must not slide toward 0 just because the aura is off — each
+    // slot owns a fixed depth regardless of which other slots are worn.
+    expect(resolveLayers({ hat: 'hat-sprout' }, CATALOG)[0].z).toBe(1)
   })
 
   it('skips an equipped id that is not in the catalog instead of crashing', () => {
     expect(resolveLayers({ hat: 'hat-deleted', aura: 'aura-glow' }, CATALOG)).toEqual([
-      { slot: 'aura', itemId: 'aura-glow', assetRef: 'aura-glow', z: 1 },
+      { slot: 'aura', itemId: 'aura-glow', assetRef: 'aura-glow', z: -2 },
     ])
   })
 
