@@ -11,91 +11,35 @@ import type { EquippedItems, Locale } from '../../../types/models'
 import { cn } from '../../../utils/cn'
 import { COSMETIC_ASSETS } from '../../rewards/cosmeticAssets'
 import { cosmeticName } from '../../rewards/cosmeticCopy'
-import { idleStateFor, reducedVitoVariants, vitoVariants } from '../animation/variants'
+import { reducedVitoVariants, vitoVariants } from '../animation/variants'
 import { moodAltText } from '../copy/moodMessages'
+import { BODY_ASSETS, FACE_ASSETS } from '../visual/visualAssets'
+import { visualStateFor } from '../visual/visualState'
 
 /**
- * Vito himself.
+ * Vito himself: the neutral body and face art, layered and animated.
  *
- * The drawing is a deliberate placeholder — CSS shapes, no art yet (design's
- * open question on the sprite set). What is NOT a placeholder is the state
- * machine around it: an idle loop chosen from mood, transient reactions
- * broadcast through `uiStore`, and a reduced-motion set that still shows
- * something happened.
- *
- * The quietest state Vito can reach is asleep. There is no frame in this file
- * where he is grey, cracked or stopped.
+ * The state machine around the art is unchanged from the CSS-shape version it
+ * replaces: an idle loop chosen from mood via `visualStateFor`, transient
+ * reactions broadcast through `uiStore`, and a reduced-motion set that still
+ * shows something happened.
  */
-
-interface StageLook {
-  /** Fixed size per evolution stage, so growing up is visible at a glance. */
-  frame: string
-  body: string
-  sprout: string
-  /** Dictionary key for the stage, not the words — see the `as const` below. */
-  descriptionKey: string
-}
 
 /*
  * `as const satisfies` rather than a plain annotation, and that is load-bearing.
  *
  * This file sits at `features/<feature>/<dir>/<file>`, a depth the ring rule
  * closes to `i18n/`, so it cannot name `TranslationKey`. `as const` keeps each
- * `descriptionKey` at its literal type, which `t()` then checks against the real
- * key union at the call site — a typo still fails `tsc -b`, with no import
+ * value at its literal type, which `t()` then checks against the real key
+ * union at the call site — a typo still fails `tsc -b`, with no import
  * crossing the boundary. Same shape as the `Locale`/`Translate` pair below.
  */
-const STAGE_LOOK = {
-  1: {
-    frame: 'size-20',
-    body: 'bg-emerald-300',
-    sprout: 'bg-emerald-500 h-3',
-    descriptionKey: 'vito.stage.1',
-  },
-  2: {
-    frame: 'size-24',
-    body: 'bg-emerald-400',
-    sprout: 'bg-emerald-600 h-4',
-    descriptionKey: 'vito.stage.2',
-  },
-  3: {
-    frame: 'size-28',
-    body: 'bg-teal-400',
-    sprout: 'bg-teal-600 h-5',
-    descriptionKey: 'vito.stage.3',
-  },
-  4: {
-    frame: 'size-32',
-    body: 'bg-cyan-400',
-    sprout: 'bg-cyan-600 h-6',
-    descriptionKey: 'vito.stage.4',
-  },
-} as const satisfies Record<EvolutionStage, StageLook>
-
-/** Eyes shut when Vito is dozing or resting; open and bright otherwise. */
-function eyeClass(mood: Mood): string {
-  if (mood === 'resting' || mood === 'sleepy') {
-    return 'h-0.5 w-3 rounded-full bg-slate-800/80'
-  }
-
-  return mood === 'thriving'
-    ? 'h-3 w-2.5 rounded-full bg-slate-800/80'
-    : 'h-2.5 w-2 rounded-full bg-slate-800/80'
-}
-
-function mouthClass(mood: Mood): string {
-  switch (mood) {
-    case 'thriving':
-      return 'h-3 w-7 rounded-b-full bg-slate-800/70'
-    case 'happy':
-      return 'h-2 w-6 rounded-b-full bg-slate-800/70'
-    case 'content':
-      return 'h-1.5 w-4 rounded-b-full bg-slate-800/60'
-    default:
-      // Dozing and resting: a small, settled line rather than a frown.
-      return 'h-0.5 w-3 rounded-full bg-slate-800/50'
-  }
-}
+const STAGE_DESCRIPTION_KEY = {
+  1: 'vito.stage.1',
+  2: 'vito.stage.2',
+  3: 'vito.stage.3',
+  4: 'vito.stage.4',
+} as const satisfies Record<EvolutionStage, string>
 
 /** The translator `useTranslate` hands out — this ring cannot import `i18n/`. */
 type Translate = ReturnType<typeof useTranslate>
@@ -146,8 +90,7 @@ export function VitoAvatar({
   // will not accept. Same pair `HabitCard` already holds.
   const locale = usePreferencesStore((state) => state.preferences.locale)
   const controls = useAnimationControls()
-  const look = STAGE_LOOK[stage]
-  const idleState = idleStateFor({ mood, allDone })
+  const visualState = visualStateFor({ mood, allDone })
   const variants = prefersReducedMotion ? reducedVitoVariants : vitoVariants
   // Depth comes from the slot's fixed place in `SLOT_RENDER_ORDER`, resolved in
   // the domain. This component never names a slot, which is what lets a fourth
@@ -156,7 +99,7 @@ export function VitoAvatar({
 
   useEffect(() => {
     if (reaction === null) {
-      void controls.start(variants[idleState])
+      void controls.start(variants[visualState.animation])
 
       return
     }
@@ -187,59 +130,33 @@ export function VitoAvatar({
     return () => {
       live = false
     }
-  }, [controls, reaction, idleState, variants, endReaction])
+  }, [controls, reaction, visualState.animation, variants, endReaction])
 
   return (
     <div
-      /*
-       * The whole drawing is dimmed and desaturated as one, rather than every
-       * shape being repainted shade by shade.
-       *
-       * This is the mechanical treatment the proposal caps this cycle at: the
-       * art is an acknowledged placeholder, and a hand-tuned dark palette for
-       * CSS shapes that are going to be replaced would be work thrown away. A
-       * filter on the frame also reaches the cosmetics for free, which is the
-       * part a per-shape pass would have missed — their sprites live in
-       * `features/rewards/`, not here. Re-raise if it reads poorly at 375px.
-       */
-      className={cn(
-        'flex h-40 w-full items-center justify-center',
-        'dark:brightness-90 dark:saturate-75',
-        className,
-      )}
+      className={cn('flex w-full items-center justify-center', className)}
       // One name for the whole drawing. Without it a screen reader gets a pile
-      // of empty decorative spans and learns nothing.
+      // of empty decorative images and learns nothing.
       role="img"
-      aria-label={`Vito, ${t(look.descriptionKey)}, ${moodAltText(locale, mood)}${wornDescription(
+      aria-label={`Vito, ${t(STAGE_DESCRIPTION_KEY[stage])}, ${moodAltText(locale, mood)}${wornDescription(
         t,
         locale,
         layers.map((layer) => layer.itemId),
       )}`}
     >
-      <motion.div animate={controls} className="relative">
-        <span
-          className={cn(
-            'absolute -top-2 left-1/2 w-1.5 -translate-x-1/2 rounded-full',
-            look.sprout,
-          )}
+      <motion.div animate={controls} className="relative aspect-square w-48 sm:w-56 md:w-64">
+        <img
+          src={BODY_ASSETS[visualState.pose]}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-contain"
         />
-        <div
-          className={cn(
-            // The hairline is a shadow in light and a rim light in dark: black
-            // on a dark page draws nothing at all.
-            'relative rounded-[45%] shadow-sm ring-1 ring-black/5 dark:ring-white/10',
-            look.frame,
-            look.body,
-          )}
-        >
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5">
-            <div className="flex items-center gap-2.5">
-              <span className={eyeClass(mood)} />
-              <span className={eyeClass(mood)} />
-            </div>
-            <span className={mouthClass(mood)} />
-          </div>
-        </div>
+        <img
+          src={FACE_ASSETS[visualState.face]}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-contain"
+        />
 
         {layers.map((layer) => {
           const Asset = COSMETIC_ASSETS[layer.assetRef]
