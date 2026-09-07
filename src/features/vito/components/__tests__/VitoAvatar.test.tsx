@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { EvolutionStage } from '../../../../domain/vito/evolution'
 import { usePreferencesStore } from '../../../../stores/preferencesStore'
 import { useUiStore } from '../../../../stores/uiStore'
+import bodyCelebrating from '../../assets/body-celebrating.png'
+import bodyNeutral from '../../assets/body-neutral.png'
 import faceHappy from '../../assets/face-happy.png'
 import faceNeutral from '../../assets/face-neutral.png'
 import faceThriving from '../../assets/face-thriving.png'
@@ -191,5 +193,99 @@ describe('VitoAvatar — a reaction temporarily borrows the face', () => {
     })
 
     expect(faceSrc(container)).toBe(faceNeutral)
+  })
+})
+
+/**
+ * `celebrating` is a temporary reaction pose, not a mood (design §3/§4): the
+ * persistent moods always render `body-neutral`, and only `levelUp` claims an
+ * override, the same way `REACTION_FACE` claims a face. `allDone` needs no
+ * entry of its own — by the time that reaction fires, the persistent
+ * `allDone` flag has already turned `visualStateFor`'s pose `celebrating`, so
+ * the two tests below drive that flag directly rather than asserting on a
+ * map entry that does not exist.
+ */
+describe('VitoAvatar — a reaction temporarily borrows the body pose', () => {
+  beforeEach(() => {
+    useUiStore.setState({ reaction: null })
+    startMock.mockReset()
+    startMock.mockResolvedValue(undefined)
+  })
+
+  function bodySrc(container: HTMLElement): string | null {
+    return container.querySelectorAll('img')[0]?.getAttribute('src') ?? null
+  }
+
+  function faceSrc(container: HTMLElement): string | null {
+    return container.querySelectorAll('img')[1]?.getAttribute('src') ?? null
+  }
+
+  it('renders the neutral body outside any reaction, for every persistent mood', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    expect(bodySrc(container)).toBe(bodyNeutral)
+  })
+
+  it('keeps the neutral body during celebrate and unlock — those reactions only borrow the face', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('celebrate')
+    })
+    expect(bodySrc(container)).toBe(bodyNeutral)
+
+    act(() => {
+      useUiStore.getState().emitReaction('unlock')
+    })
+    expect(bodySrc(container)).toBe(bodyNeutral)
+  })
+
+  it('shows the celebrating body and thriving face once today is fully done, via the persistent allDone flag', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" allDone />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('allDone')
+    })
+
+    expect(bodySrc(container)).toBe(bodyCelebrating)
+    expect(faceSrc(container)).toBe(faceThriving)
+  })
+
+  it('shows the celebrating body and thriving face for a level-up reaction, even mid-day with allDone false', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" allDone={false} />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('levelUp')
+    })
+
+    expect(bodySrc(container)).toBe(bodyCelebrating)
+    expect(faceSrc(container)).toBe(faceThriving)
+  })
+
+  it('returns to the persistent body once a level-up reaction clears', async () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" allDone={false} />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('levelUp')
+    })
+    expect(bodySrc(container)).toBe(bodyCelebrating)
+
+    await waitFor(() => {
+      expect(useUiStore.getState().reaction).toBeNull()
+    })
+    expect(bodySrc(container)).toBe(bodyNeutral)
+  })
+
+  it('keeps equipped cosmetics mounted while the celebrating body is showing', () => {
+    const { container } = render(
+      <VitoAvatar stage={1} mood="content" allDone={false} equipped={{ hat: 'hat-sprout' }} />,
+    )
+
+    act(() => {
+      useUiStore.getState().emitReaction('levelUp')
+    })
+
+    expect(bodySrc(container)).toBe(bodyCelebrating)
+    expect(container.querySelectorAll('img')).toHaveLength(3) // body + face + the hat layer
   })
 })

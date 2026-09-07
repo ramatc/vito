@@ -15,7 +15,7 @@ import { cosmeticName } from '../../rewards/cosmeticCopy'
 import { reducedVitoVariants, vitoVariants } from '../animation/variants'
 import { moodAltText } from '../copy/moodMessages'
 import { BODY_ASSETS, FACE_ASSETS } from '../visual/visualAssets'
-import type { VitoFace } from '../visual/visualState'
+import type { VitoFace, VitoPose } from '../visual/visualState'
 import { visualStateFor } from '../visual/visualState'
 
 /**
@@ -62,6 +62,19 @@ const REACTION_FACE: Partial<Record<ReactionType, VitoFace>> = {
   unlock: 'happy',
   levelUp: 'thriving',
   allDone: 'thriving',
+}
+
+/**
+ * The body pose a reaction borrows while it plays, same idea as
+ * `REACTION_FACE`. Reserved for `levelUp` — the one reaction with nothing
+ * persistent behind it. `allDone` needs no entry here: it only fires once
+ * today's list is fully done, and by then `visualStateFor`'s own `allDone`
+ * flag has already turned the persistent pose `celebrating`, so the reaction
+ * would just be overriding it with itself. Every other reaction keeps
+ * whatever body the mood already shows.
+ */
+const REACTION_BODY: Partial<Record<ReactionType, VitoPose>> = {
+  levelUp: 'celebrating',
 }
 
 /**
@@ -115,6 +128,11 @@ export function VitoAvatar({
   // The mood face, unless a reaction is currently playing and claims one —
   // released the instant the reaction ends, same as the animation it rides with.
   const displayedFace = reaction !== null ? (REACTION_FACE[reaction.type] ?? visualState.face) : visualState.face
+  // Same override idea, for the body pose. Falls back to the persistent pose
+  // for every reaction that does not claim one, so it reverts on its own the
+  // instant `reaction` clears — no separate lifecycle to manage.
+  const displayedPose: VitoPose =
+    reaction !== null ? (REACTION_BODY[reaction.type] ?? visualState.pose) : visualState.pose
   // Depth comes from the slot's fixed place in `SLOT_RENDER_ORDER`, resolved in
   // the domain. This component never names a slot, which is what lets a fourth
   // one be added as pure data later (design §7).
@@ -176,7 +194,7 @@ export function VitoAvatar({
           which slot is which.
         */}
         <img
-          src={BODY_ASSETS[visualState.pose]}
+          src={BODY_ASSETS[displayedPose]}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-contain"
