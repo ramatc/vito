@@ -7,6 +7,7 @@ import type { Mood } from '../../../domain/vito/mood'
 import { useTranslate } from '../../../hooks/useTranslate'
 import { useVitoReaction } from '../../../hooks/useVitoReaction'
 import { usePreferencesStore } from '../../../stores/preferencesStore'
+import type { ReactionType } from '../../../stores/uiStore'
 import type { EquippedItems, Locale } from '../../../types/models'
 import { cn } from '../../../utils/cn'
 import { COSMETIC_ASSETS } from '../../rewards/cosmeticAssets'
@@ -14,6 +15,7 @@ import { cosmeticName } from '../../rewards/cosmeticCopy'
 import { reducedVitoVariants, vitoVariants } from '../animation/variants'
 import { moodAltText } from '../copy/moodMessages'
 import { BODY_ASSETS, FACE_ASSETS } from '../visual/visualAssets'
+import type { VitoFace } from '../visual/visualState'
 import { visualStateFor } from '../visual/visualState'
 
 /**
@@ -43,6 +45,24 @@ const STAGE_DESCRIPTION_KEY = {
 
 /** The translator `useTranslate` hands out — this ring cannot import `i18n/`. */
 type Translate = ReturnType<typeof useTranslate>
+
+/**
+ * The face a reaction borrows while it plays, on top of whatever `visualStateFor`
+ * (mood, persistent) would otherwise show.
+ *
+ * This is deliberately not part of `visualStateFor`: mood is a persistent
+ * derived state, a reaction is a transient one, and mixing the two there would
+ * let a single habit completion quietly relabel how Vito "feels". `thriving` is
+ * reserved for the two reactions that actually earn it — finishing the day and
+ * levelling up — everything else borrows `happy`. Reactions with no entry here
+ * (`wake`) keep the mood face and only animate.
+ */
+const REACTION_FACE: Partial<Record<ReactionType, VitoFace>> = {
+  celebrate: 'happy',
+  unlock: 'happy',
+  levelUp: 'thriving',
+  allDone: 'thriving',
+}
 
 /**
  * "wearing X and Y", or nothing at all when he is going as himself.
@@ -92,6 +112,9 @@ export function VitoAvatar({
   const controls = useAnimationControls()
   const visualState = visualStateFor({ mood, allDone })
   const variants = prefersReducedMotion ? reducedVitoVariants : vitoVariants
+  // The mood face, unless a reaction is currently playing and claims one —
+  // released the instant the reaction ends, same as the animation it rides with.
+  const displayedFace = reaction !== null ? (REACTION_FACE[reaction.type] ?? visualState.face) : visualState.face
   // Depth comes from the slot's fixed place in `SLOT_RENDER_ORDER`, resolved in
   // the domain. This component never names a slot, which is what lets a fourth
   // one be added as pure data later (design §7).
@@ -152,7 +175,7 @@ export function VitoAvatar({
           className="absolute inset-0 h-full w-full object-contain"
         />
         <img
-          src={FACE_ASSETS[visualState.face]}
+          src={FACE_ASSETS[displayedFace]}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-contain"

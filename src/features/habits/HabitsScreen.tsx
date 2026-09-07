@@ -25,7 +25,7 @@ export function HabitsScreen() {
   const t = useTranslate()
   const habits = useHabitStore((state) => state.habits)
   const { completedHabitIds, today } = useTodayHabits()
-  const { toggle, pendingHabitIds } = useCompleteHabit(today)
+  const { toggle, pendingHabitIds, lastGain } = useCompleteHabit(today)
 
   const [editing, setEditing] = useState<Habit | undefined>(undefined)
   const [formOpen, setFormOpen] = useState(false)
@@ -94,6 +94,7 @@ export function HabitsScreen() {
         completedHabitIds={completedHabitIds}
         onToggle={onToggle}
         busyHabitIds={pendingHabitIds}
+        lastGain={lastGain}
         onEdit={openEdit}
         onArchive={setArchiving}
         empty={

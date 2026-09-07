@@ -3,6 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { EvolutionStage } from '../../../../domain/vito/evolution'
 import { usePreferencesStore } from '../../../../stores/preferencesStore'
 import { useUiStore } from '../../../../stores/uiStore'
+import faceHappy from '../../assets/face-happy.png'
+import faceNeutral from '../../assets/face-neutral.png'
+import faceThriving from '../../assets/face-thriving.png'
 import { VitoAvatar } from '../VitoAvatar'
 
 /**
@@ -122,5 +125,71 @@ describe('VitoAvatar — the stage description in the active language', () => {
     expect(
       screen.getByRole('img', { name: new RegExp(`^Vito, ${es},`) }),
     ).toBeInTheDocument()
+  })
+})
+
+/**
+ * A reaction borrows the face while it plays, on top of whatever mood would
+ * otherwise show — the temporary-override half of design §7. `content` mood
+ * renders `neutral`, so any face other than neutral here can only have come
+ * from the reaction map.
+ */
+describe('VitoAvatar — a reaction temporarily borrows the face', () => {
+  beforeEach(() => {
+    useUiStore.setState({ reaction: null })
+    startMock.mockReset()
+    startMock.mockResolvedValue(undefined)
+  })
+
+  function faceSrc(container: HTMLElement): string | null {
+    const images = container.querySelectorAll('img')
+
+    return images[1]?.getAttribute('src') ?? null
+  }
+
+  it('shows happy during an ordinary celebrate reaction, content mood otherwise', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    expect(faceSrc(container)).toBe(faceNeutral)
+
+    act(() => {
+      useUiStore.getState().emitReaction('celebrate')
+    })
+
+    expect(faceSrc(container)).toBe(faceHappy)
+  })
+
+  it('shows thriving during the all-done reaction, regardless of mood', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('allDone')
+    })
+
+    expect(faceSrc(container)).toBe(faceThriving)
+  })
+
+  it('returns to the mood face once the reaction clears', async () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('celebrate')
+    })
+    expect(faceSrc(container)).toBe(faceHappy)
+
+    await waitFor(() => {
+      expect(useUiStore.getState().reaction).toBeNull()
+    })
+    expect(faceSrc(container)).toBe(faceNeutral)
+  })
+
+  it('does not override the face for a wake reaction', () => {
+    const { container } = render(<VitoAvatar stage={1} mood="content" />)
+
+    act(() => {
+      useUiStore.getState().emitReaction('wake')
+    })
+
+    expect(faceSrc(container)).toBe(faceNeutral)
   })
 })

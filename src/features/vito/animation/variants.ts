@@ -92,6 +92,19 @@ export const vitoVariants: Record<VitoAnimationState, TargetAndTransition> = {
     opacity: 1,
     transition: { duration: 0.9, ease: 'easeOut' },
   },
+
+  /**
+   * Every scheduled habit is done for the day: a slightly bigger version of
+   * `celebrate`, not a different move — the celebration body/animation this
+   * stands in for hasn't landed yet (design §9).
+   */
+  allDone: {
+    y: [0, -22, 0],
+    scale: [1, 1.16, 1],
+    rotate: [0, -8, 8, 0],
+    opacity: 1,
+    transition: { duration: 0.8, ease: 'easeOut' },
+  },
 }
 
 /**
@@ -126,6 +139,7 @@ export const reducedVitoVariants: Record<VitoAnimationState, TargetAndTransition
   levelUp: blink,
   unlock: blink,
   wake: blink,
+  allDone: blink,
 }
 
 /**

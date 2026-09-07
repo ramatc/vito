@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { XpGainEvent } from '../../hooks/useCompleteHabit'
 import type { Habit } from '../../types/models'
 import { HabitCard } from './HabitCard'
 
@@ -16,6 +17,8 @@ export interface HabitListProps {
   /** Shown instead of the list when there is nothing to render. */
   empty: ReactNode
   busyHabitIds?: readonly string[]
+  /** The most recent XP reward, routed to the card that earned it. */
+  lastGain?: XpGainEvent | null
 }
 
 export function HabitList({
@@ -26,6 +29,7 @@ export function HabitList({
   onArchive,
   empty,
   busyHabitIds = [],
+  lastGain = null,
 }: HabitListProps) {
   if (habits.length === 0) {
     return <>{empty}</>
@@ -45,6 +49,7 @@ export function HabitList({
             onToggle={onToggle}
             onEdit={onEdit}
             onArchive={onArchive}
+            xpGainEvent={lastGain?.habitId === habit.id ? lastGain : undefined}
           />
         </li>
       ))}

@@ -11,7 +11,7 @@ import { newId } from '../utils/id'
  * subtrees, which is why a shared store beats prop drilling here.
  */
 
-export type ReactionType = 'celebrate' | 'levelUp' | 'unlock' | 'wake'
+export type ReactionType = 'celebrate' | 'levelUp' | 'unlock' | 'wake' | 'allDone'
 
 export interface Reaction {
   type: ReactionType

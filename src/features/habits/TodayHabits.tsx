@@ -15,7 +15,7 @@ import { HabitList } from './HabitList'
 export function TodayHabits() {
   const { habits, completedHabitIds, completedCount, scheduledCount, allDone, restDay } =
     useTodayHabits()
-  const { toggle, pendingHabitIds } = useCompleteHabit()
+  const { toggle, pendingHabitIds, lastGain } = useCompleteHabit()
   const t = useTranslate()
 
   const onToggle = (habitId: string) => {
@@ -44,6 +44,7 @@ export function TodayHabits() {
         completedHabitIds={completedHabitIds}
         onToggle={onToggle}
         busyHabitIds={pendingHabitIds}
+        lastGain={lastGain}
         empty={
           <Card className="flex flex-col items-start gap-2 text-sm text-slate-600 dark:text-muted">
             {restDay ? (
