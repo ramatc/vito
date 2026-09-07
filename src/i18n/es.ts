@@ -77,7 +77,6 @@ export const ES: Dictionary = {
 
   'habits.today.label': 'Hábitos de hoy',
   'habits.today.progress': '{completed} de {scheduled} hechos hoy',
-  'habits.today.allDone': 'Eso es todo por hoy. Vito está encantado.',
   'habits.today.restTitle': 'Hoy no hay nada agendado',
   'habits.today.restDescription':
     'Vito se la está tomando con calma. Listo cuando vos quieras.',

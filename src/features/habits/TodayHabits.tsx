@@ -13,8 +13,7 @@ import { HabitList } from './HabitList'
  * nothing scheduled is a rest day, not a miss.
  */
 export function TodayHabits() {
-  const { habits, completedHabitIds, completedCount, scheduledCount, allDone, restDay } =
-    useTodayHabits()
+  const { habits, completedHabitIds, completedCount, scheduledCount, restDay } = useTodayHabits()
   const { toggle, pendingHabitIds, lastGain } = useCompleteHabit()
   const t = useTranslate()
 
@@ -31,12 +30,6 @@ export function TodayHabits() {
             scheduled: scheduledCount,
           })}
         </p>
-      )}
-
-      {allDone && (
-        <Card className="bg-emerald-50 text-sm text-emerald-800 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-200 dark:ring-emerald-500/30">
-          {t('habits.today.allDone')}
-        </Card>
       )}
 
       <HabitList

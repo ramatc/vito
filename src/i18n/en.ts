@@ -89,7 +89,6 @@ export const EN = {
 
   'habits.today.label': "Today's habits",
   'habits.today.progress': '{completed} of {scheduled} done today',
-  'habits.today.allDone': 'That is everything for today. Vito is delighted.',
   'habits.today.restTitle': 'Nothing scheduled today',
   'habits.today.restDescription': 'Vito is taking it easy. Ready whenever you are.',
   'habits.today.emptyDescription':
