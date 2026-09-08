@@ -83,33 +83,45 @@ export function HabitsScreen() {
       title={t('habits.title')}
       description={t('habits.description')}
       action={
-        <Button size="sm" onClick={openNew}>
-          <Plus className="size-4" />
-          {t('habits.new')}
-        </Button>
+        <button
+          type="button"
+          aria-label={t('habits.new')}
+          onClick={openNew}
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+        >
+          <Plus className="size-5" strokeWidth={2.5} />
+        </button>
       }
     >
-      <HabitList
-        habits={activeHabits}
-        completedHabitIds={completedHabitIds}
-        onToggle={onToggle}
-        busyHabitIds={pendingHabitIds}
-        lastGain={lastGain}
-        onEdit={openEdit}
-        onArchive={setArchiving}
-        empty={
-          <Card className="flex flex-col items-start gap-3 text-sm text-muted">
-            <span className="font-medium text-primary">
-              {t('habits.empty.title')}
-            </span>
-            <span>{t('habits.empty.description')}</span>
-            <Button size="sm" onClick={openNew}>
-              <Plus className="size-4" />
-              {t('habits.empty.action')}
-            </Button>
-          </Card>
-        }
-      />
+      <div className="flex flex-col gap-2">
+        {activeHabits.length > 0 && (
+          <h2 className="px-1 text-xs font-bold tracking-wide text-muted uppercase">
+            {t('habits.section.all', { count: activeHabits.length })}
+          </h2>
+        )}
+
+        <HabitList
+          habits={activeHabits}
+          completedHabitIds={completedHabitIds}
+          onToggle={onToggle}
+          busyHabitIds={pendingHabitIds}
+          lastGain={lastGain}
+          onEdit={openEdit}
+          onArchive={setArchiving}
+          empty={
+            <Card className="flex flex-col items-start gap-3 text-sm text-muted">
+              <span className="font-medium text-primary">
+                {t('habits.empty.title')}
+              </span>
+              <span>{t('habits.empty.description')}</span>
+              <Button size="sm" onClick={openNew}>
+                <Plus className="size-4" />
+                {t('habits.empty.action')}
+              </Button>
+            </Card>
+          }
+        />
+      </div>
 
       <HabitFormModal
         open={formOpen}
