@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { TranslationKey } from '../../i18n/keys'
 import { useTranslate } from '../../hooks/useTranslate'
 import type { CosmeticSlot } from '../../types/models'
@@ -35,7 +36,9 @@ export function SlotPicker({ value, onChange, className }: SlotPickerProps) {
   const t = useTranslate()
 
   return (
-    <div
+    <motion.div
+      layout
+      transition={{ duration: 0.25, ease: 'easeOut' }}
       role="group"
       aria-label={t('closet.slots.label')}
       className={cn('flex gap-2 overflow-x-auto', className)}
@@ -58,14 +61,14 @@ export function SlotPicker({ value, onChange, className }: SlotPickerProps) {
               // `LanguageToggle`/`ThemeToggle`, which copy this control: the
               // three are the same segmented button and must not drift apart.
               selected
-                ? 'bg-emerald-600 text-white focus-visible:outline-emerald-600 dark:bg-brand dark:text-surface dark:focus-visible:outline-brand'
-                : 'bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50 focus-visible:outline-slate-400 dark:bg-surface-raised dark:text-muted dark:ring-slate-700 dark:hover:bg-slate-700 dark:focus-visible:outline-slate-500',
+                ? 'bg-brand text-on-brand focus-visible:outline-brand'
+                : 'bg-surface-raised text-muted ring-1 ring-border hover:bg-surface-sunken focus-visible:outline-border',
             )}
           >
             {t(entry.labelKey)}
           </button>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

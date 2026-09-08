@@ -44,9 +44,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   override render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-svh flex-col items-center justify-center gap-2 bg-slate-50 p-6 text-center">
-          <p className="text-sm font-medium text-slate-900">{this.props.title}</p>
-          <p className="text-sm text-slate-600">{this.props.hint}</p>
+        <div className="flex min-h-svh flex-col items-center justify-center gap-2 bg-surface p-6 text-center">
+          <p className="text-sm font-medium text-primary">{this.props.title}</p>
+          <p className="text-sm text-muted">{this.props.hint}</p>
         </div>
       )
     }

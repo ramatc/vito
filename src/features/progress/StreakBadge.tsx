@@ -32,22 +32,16 @@ export function StreakBadge({ hasStreak, headline, best, className }: StreakBadg
     <div
       className={cn(
         'flex items-center gap-3 rounded-xl px-3 py-2',
-        // The dark pair lifts the neutral state onto a raised slate rather than
-        // pairing tint for tint: `bg-slate-100 text-slate-600` inverted
-        // mechanically keeps both halves the same distance apart and stays as
-        // hard to read as it is in light.
         started
           ? 'bg-amber-50 text-amber-900 dark:bg-amber-500/10 dark:text-amber-200'
-          : 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-200',
+          : 'bg-surface-sunken text-muted',
         className,
       )}
     >
       <Flame
         className={cn(
           'size-5 shrink-0',
-          started
-            ? 'text-amber-500 dark:text-amber-300'
-            : 'text-slate-400 dark:text-slate-300',
+          started ? 'text-amber-500 dark:text-amber-300' : 'text-muted',
         )}
       />
       <div className="min-w-0">

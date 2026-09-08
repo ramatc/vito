@@ -54,7 +54,7 @@ function App() {
           <div
             role="status"
             aria-live="polite"
-            className="bg-amber-50 px-4 py-2 text-center text-xs text-amber-800"
+            className="bg-warm-soft px-4 py-2 text-center text-xs text-warm-text"
           >
             {t('app.storageError')}
           </div>

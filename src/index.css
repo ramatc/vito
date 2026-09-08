@@ -18,41 +18,53 @@
 }
 
 /*
- * Five seeded colours, not a palette rewrite.
- *
- * The screens are painted in Tailwind's slate and emerald scales and stay that
- * way; these exist for the handful of surfaces that have to flip wholesale, and
- * everything else pairs an explicit `dark:` utility instead. A full token layer
- * would have meant touching every file in the app to gain a rename.
- *
- * `color-scheme` is what makes the parts the app does not paint follow along —
- * scrollbars, form controls, the space behind an over-scroll.
+ * PREVIEW: a hybrid — light half copied from the reference project's
+ * "Proposed (Vito B)" ("Warm Chalk" ground, emerald brand, amber-100/800
+ * streak, 1.5px borders), dark half kept as our own Brote direction (sage/
+ * moss neutrals, sprout-green brand, honey-amber streak) rather than the
+ * reference's "Night Slate" + teal. See DESIGN.md for the committed Brote
+ * contract and chat history for the other trials' values if we need to
+ * revert either half.
  */
 :root {
   color-scheme: light;
 
-  --surface: #f8fafc;
+  --surface: #f6f5f1;
   --surface-raised: #ffffff;
-  --primary: #0f172a;
-  --muted: #64748b;
-  --brand: #059669;
+  --surface-sunken: #e8e6e0;
+  --primary: #1a1e24;
+  --muted: #67707d;
+  --brand: #10b981;
+  --brand-strong: #059669;
+  --on-brand: #ffffff;
+  --warm: #d97706;
+  --warm-soft: #fef3c7;
+  --warm-text: #92400e;
+  --border: #e8e6e0;
 }
 
 .dark {
   color-scheme: dark;
 
-  --surface: #0f172a;
-  --surface-raised: #1e293b;
-  --primary: #f1f5f9;
-  --muted: #94a3b8;
-  --brand: #34d399;
+  --surface: #14181a;
+  --surface-raised: #1e2622;
+  --surface-sunken: #191f1b;
+  --primary: #edf2ec;
+  --muted: #a8afa5;
+  --brand: #5fc97f;
+  --brand-strong: #7adb98;
+  --on-brand: #0f2717;
+  --warm: #f0b15e;
+  --warm-soft: #3a2c16;
+  --warm-text: #f3d9a8;
+  --border: #2a322c;
 }
 
 /*
  * `inline` is the load-bearing word.
  *
  * Without it Tailwind resolves a theme value when it builds the stylesheet, and
- * these five would freeze at whatever `:root` said — the `.dark` block would
+ * these tokens would freeze at whatever `:root` said — the `.dark` block would
  * change the custom properties and nothing on screen would move. `inline`
  * substitutes the `var()` into the utility itself, so the lookup happens in the
  * browser, at the element, under whichever block is currently winning.
@@ -60,9 +72,16 @@
 @theme inline {
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
   --color-primary: var(--primary);
   --color-muted: var(--muted);
   --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-on-brand: var(--on-brand);
+  --color-warm: var(--warm);
+  --color-warm-soft: var(--warm-soft);
+  --color-warm-text: var(--warm-text);
+  --color-border: var(--border);
 }
 
 html,

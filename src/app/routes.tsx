@@ -7,8 +7,10 @@ import { TodayHabits } from '../features/habits/TodayHabits'
 import { ProgressSection } from '../features/progress/ProgressSection'
 import { ClosetScreen } from '../features/rewards/ClosetScreen'
 import { SettingsScreen } from '../features/settings/SettingsScreen'
+import { VitoAvatar } from '../features/vito/components/VitoAvatar'
 import { VitoStage } from '../features/vito/components/VitoStage'
 import { useTranslate } from '../hooks/useTranslate'
+import { useVito } from '../hooks/useVito'
 import { resetAllData } from './bootstrap'
 
 /**
@@ -73,6 +75,25 @@ function AppShellRoute() {
 }
 
 /**
+ * Closet: the wardrobe, and the live avatar it dresses.
+ *
+ * Composed here for the same reason `HomeRoute` is: the surface spans two
+ * features (`rewards` for the catalog, `vito` for the avatar that wears it),
+ * and a nested feature file may not reach into another feature's subdirectory
+ * (design §6 / `.oxlintrc.json`) — the route is the one ring allowed to see
+ * both.
+ */
+function ClosetRoute() {
+  const { mood, stage, allDone, equippedItems } = useVito()
+
+  return (
+    <ClosetScreen
+      preview={<VitoAvatar stage={stage} mood={mood} allDone={allDone} equipped={equippedItems} />}
+    />
+  )
+}
+
+/**
  * Settings gets its destructive capability handed to it from here.
  *
  * `resetAllData` clears storage and rehydrates every store, which needs both
@@ -90,7 +111,7 @@ export function AppRoutes() {
       <Route element={<AppShellRoute />}>
         <Route index element={<HomeRoute />} />
         <Route path="habits" element={<HabitsScreen />} />
-        <Route path="closet" element={<ClosetScreen />} />
+        <Route path="closet" element={<ClosetRoute />} />
         <Route path="settings" element={<SettingsRoute />} />
         {/* An unknown URL lands on Today rather than on a dead end. */}
         <Route path="*" element={<Navigate to="/" replace />} />

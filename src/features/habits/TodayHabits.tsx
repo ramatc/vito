@@ -24,7 +24,7 @@ export function TodayHabits() {
   return (
     <section className="flex flex-col gap-3" aria-label={t('habits.today.label')}>
       {scheduledCount > 0 && (
-        <p className="text-sm text-slate-500 dark:text-muted">
+        <p className="text-sm text-muted">
           {t('habits.today.progress', {
             completed: completedCount,
             scheduled: scheduledCount,
@@ -39,17 +39,17 @@ export function TodayHabits() {
         busyHabitIds={pendingHabitIds}
         lastGain={lastGain}
         empty={
-          <Card className="flex flex-col items-start gap-2 text-sm text-slate-600 dark:text-muted">
+          <Card className="flex flex-col items-start gap-2 text-sm text-muted">
             {restDay ? (
               <>
-                <span className="font-medium text-slate-900 dark:text-primary">
+                <span className="font-medium text-primary">
                   {t('habits.today.restTitle')}
                 </span>
                 <span>{t('habits.today.restDescription')}</span>
               </>
             ) : (
               <>
-                <span className="font-medium text-slate-900 dark:text-primary">
+                <span className="font-medium text-primary">
                   {t('habits.empty.title')}
                 </span>
                 <span>{t('habits.today.emptyDescription')}</span>
@@ -57,7 +57,7 @@ export function TodayHabits() {
             )}
             <Link
               to="/habits"
-              className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 hover:text-emerald-800 dark:text-brand dark:hover:text-emerald-300"
+              className="mt-1 inline-flex min-h-11 items-center text-sm font-medium text-brand hover:text-brand-strong"
             >
               {t('habits.today.goToHabits')}
             </Link>

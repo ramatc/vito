@@ -59,18 +59,18 @@ export function SettingsScreen({ onResetProgress }: SettingsScreenProps) {
         <ThemeToggle label={t('settings.theme.label')} />
       </Card>
 
-      <Card className="flex flex-col gap-2 text-sm text-slate-600 dark:text-muted">
-        <h2 className="text-sm font-medium text-slate-900 dark:text-primary">
+      <Card className="flex flex-col gap-2 text-sm text-muted">
+        <h2 className="text-sm font-medium text-primary">
           {t('settings.storage.title')}
         </h2>
         <p>{t('settings.storage.body')}</p>
-        <p className="text-xs text-slate-500 dark:text-muted">
+        <p className="text-xs text-muted">
           {t('settings.storage.caveat')}
         </p>
       </Card>
 
-      <Card className="flex flex-col items-start gap-3 text-sm text-slate-600 dark:text-muted">
-        <h2 className="text-sm font-medium text-slate-900 dark:text-primary">
+      <Card className="flex flex-col items-start gap-3 text-sm text-muted">
+        <h2 className="text-sm font-medium text-primary">
           {t('settings.reset.title')}
         </h2>
         <p>{t('settings.reset.description')}</p>

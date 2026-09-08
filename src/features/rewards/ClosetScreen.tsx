@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
+import { motion } from 'framer-motion'
 import { Screen } from '../../components/layout/Screen'
-import { Card } from '../../components/ui/Card'
 import { COSMETIC_CATALOG } from '../../domain/vito/cosmeticCatalog'
 import { useTranslate } from '../../hooks/useTranslate'
 import { useVito } from '../../hooks/useVito'
@@ -22,6 +22,12 @@ import { SlotPicker } from './SlotPicker'
  *
  * Slots are independent on purpose. Equipping a hat writes one key of
  * `EquippedItems` and leaves the others exactly where they were.
+ *
+ * `preview` is handed down from `ClosetRoute` rather than rendered here: the
+ * live avatar is `features/vito`'s `VitoAvatar`, and a nested feature file may
+ * not reach into another feature's subdirectory (design §6 / `.oxlintrc.json`).
+ * The route is the composition root that is allowed to see both, the same
+ * reason `app/routes.tsx` assembles `HomeRoute` from three features directly.
  */
 
 /** What Vito is wearing right now, across every slot, in one line. */
@@ -41,7 +47,12 @@ function wornSummary(
   return t('closet.worn.some', { items: names.join(` ${t('common.and')} `) })
 }
 
-export function ClosetScreen() {
+export interface ClosetScreenProps {
+  /** The live Vito avatar, wearing whatever is currently equipped. */
+  preview: ReactNode
+}
+
+export function ClosetScreen({ preview }: ClosetScreenProps) {
   const t = useTranslate()
   // The raw locale as well as the translator: `cosmeticName` builds its key
   // from an id, which `useTranslate` deliberately will not accept.
@@ -65,12 +76,24 @@ export function ClosetScreen() {
 
   return (
     <Screen title={t('closet.title')} description={t('closet.description')}>
-      <Card className="text-sm text-slate-600 dark:text-muted">
-        <p>{wornSummary(t, locale, equippedItems)}</p>
-        <p className="mt-1 text-xs text-slate-500 dark:text-muted">
-          {t('closet.worn.hint')}
-        </p>
-      </Card>
+      {/*
+        `layout` on the stage and everything under it: the worn-summary
+        sentence grows from "va como él mismo" to naming three items, and
+        without this the height change would shove the picker and grid down
+        in one instant jump rather than a smooth reflow.
+      */}
+      <motion.section
+        layout
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        aria-label={t('closet.title')}
+        className="flex flex-col items-center gap-3 rounded-3xl bg-gradient-to-b from-brand/10 to-surface-raised px-6 pt-7 pb-6 ring-1 ring-brand/20"
+      >
+        {preview}
+        <motion.p layout className="text-center text-sm font-medium text-primary">
+          {wornSummary(t, locale, equippedItems)}
+        </motion.p>
+        <p className="text-center text-xs text-muted">{t('closet.worn.hint')}</p>
+      </motion.section>
 
       <SlotPicker value={slot} onChange={setSlot} />
 

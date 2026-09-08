@@ -98,8 +98,8 @@ export function HabitsScreen() {
         onEdit={openEdit}
         onArchive={setArchiving}
         empty={
-          <Card className="flex flex-col items-start gap-3 text-sm text-slate-600 dark:text-muted">
-            <span className="font-medium text-slate-900 dark:text-primary">
+          <Card className="flex flex-col items-start gap-3 text-sm text-muted">
+            <span className="font-medium text-primary">
               {t('habits.empty.title')}
             </span>
             <span>{t('habits.empty.description')}</span>

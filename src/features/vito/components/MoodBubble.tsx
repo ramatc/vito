@@ -28,8 +28,8 @@ export function MoodBubble({ headline, body, className }: MoodBubbleProps) {
       aria-live="polite"
       className={cn('flex max-w-xs flex-col items-center gap-1 text-center', className)}
     >
-      <p className="text-base font-semibold text-slate-900 dark:text-primary">{headline}</p>
-      <p className="text-sm leading-relaxed text-slate-600 dark:text-muted">{body}</p>
+      <p className="text-base font-semibold text-primary">{headline}</p>
+      <p className="text-sm leading-relaxed text-muted">{body}</p>
     </div>
   )
 }

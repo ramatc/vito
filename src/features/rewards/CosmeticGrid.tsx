@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { Check, Lock } from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import type { TranslationKey } from '../../i18n/keys'
@@ -10,14 +11,14 @@ import { COSMETIC_PREVIEW_IMAGES } from './cosmeticPreviewImages'
 type Translate = ReturnType<typeof useTranslate>
 
 /**
- * One slot's worth of the catalog: what is earned, what is worn, and what is
- * still ahead.
+ * One slot's worth of the catalog, as a grid of tiles: what is earned, what is
+ * worn, and what is still ahead.
  *
  * Presentational — it takes items and ids and reports taps. Whether an item is
  * unlocked was decided in `domain/vito/cosmetics`, and whether it can be
  * equipped is `vitoStore`'s call; this file only draws the answer.
  *
- * A locked item is shown rather than hidden, and it states its threshold
+ * A locked tile is shown rather than hidden, and it states its threshold
  * plainly. Nothing here scolds: a threshold is a destination, not a shortfall.
  */
 
@@ -48,19 +49,24 @@ function unlockLabel(t: Translate, item: CosmeticItem): string {
 }
 
 /**
- * The item on its own, the way the closet lists it — unlike `VitoAvatar`,
- * which draws the same cosmetic positioned against Vito's frame, this tile
- * has no body to hang a hat or backpack off of. Its artwork
+ * The item on its own, the way the tile shows it — unlike `VitoAvatar`, which
+ * draws the same cosmetic positioned against Vito's frame, this preview has no
+ * body to hang a hat or backpack off of. Its artwork
  * (`cosmeticPreviewImages.ts`) is a self-contained icon with its own margin
  * baked in, so it is never clipped or rescaled here.
  */
-function ItemPreview({ assetRef }: { assetRef: string }) {
+function ItemPreview({ assetRef, dimmed }: { assetRef: string; dimmed: boolean }) {
   const previewSrc = COSMETIC_PREVIEW_IMAGES[assetRef]
 
   return (
-    <span className="flex size-12 shrink-0 items-center justify-center rounded-[45%] bg-emerald-200/70 dark:bg-emerald-500/25 dark:brightness-90 dark:saturate-75">
+    <span
+      className={cn(
+        'flex size-14 shrink-0 items-center justify-center rounded-[45%] bg-brand/20',
+        dimmed && 'opacity-40 grayscale dark:opacity-100',
+      )}
+    >
       {previewSrc !== undefined && (
-        <img src={previewSrc} alt="" className="size-9 object-contain" />
+        <img src={previewSrc} alt="" className="size-10 object-contain" />
       )}
     </span>
   )
@@ -86,32 +92,68 @@ export function CosmeticGrid({
   const locale = usePreferencesStore((state) => state.preferences.locale)
 
   return (
-    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <motion.ul
+      layout
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className="grid grid-cols-2 gap-3 sm:grid-cols-3"
+    >
       {items.map((item) => {
         const unlocked = unlockedItemIds.includes(item.id)
         const equipped = item.id === equippedItemId
 
+        const tileClassName = cn(
+          'flex min-h-[152px] w-full flex-col items-center justify-between gap-2 rounded-2xl p-3.5 text-center transition-colors',
+          !unlocked && 'border border-dashed border-border opacity-60',
+          unlocked &&
+            (equipped
+              ? 'bg-brand/10 ring-2 ring-brand'
+              : 'bg-surface-raised ring-1 ring-border hover:bg-surface-sunken'),
+        )
+
+        const tileContent = (
+          <>
+            <div className="flex w-full items-center justify-between text-[10px] font-semibold text-muted">
+              <span>{t(RARITY_LABEL_KEYS[item.rarity])}</span>
+              {equipped && (
+                <span className="flex items-center gap-0.5 rounded-md bg-brand px-1.5 py-0.5 font-bold text-on-brand">
+                  <Check className="size-2.5" strokeWidth={3} />
+                </span>
+              )}
+            </div>
+
+            <ItemPreview assetRef={item.assetRef} dimmed={!unlocked} />
+
+            <div className="w-full min-w-0">
+              <p className="truncate text-xs font-bold text-primary">
+                {cosmeticName(locale, item.id)}
+              </p>
+
+              {unlocked ? (
+                <p
+                  className={cn(
+                    'mt-1 text-[11px] font-semibold',
+                    equipped ? 'text-brand' : 'text-muted',
+                  )}
+                >
+                  {equipped ? t('closet.item.worn') : t('closet.item.wear')}
+                </p>
+              ) : (
+                <p className="mt-1 flex items-center justify-center gap-1 text-[10px] text-muted">
+                  <Lock className="size-2.5 shrink-0" />
+                  {unlockLabel(t, item)}
+                </p>
+              )}
+            </div>
+          </>
+        )
+
+        // A locked tile offers nothing to activate, so it is a `div`, not a
+        // disabled button: a control with no action is not a control (a
+        // screen reader user gets a label, not a dead button to puzzle over).
         if (!unlocked) {
           return (
-            <li
-              key={item.id}
-              className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200 dark:bg-surface-raised dark:ring-slate-700"
-            >
-              <span className="opacity-40 grayscale dark:opacity-100">
-                <ItemPreview assetRef={item.assetRef} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-slate-900 dark:text-primary">
-                  {cosmeticName(locale, item.id)}
-                </span>
-                <span className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 dark:text-muted">
-                  <Lock className="size-3 shrink-0" />
-                  {unlockLabel(t, item)}
-                </span>
-                <span className="mt-0.5 block text-xs text-slate-400 dark:text-slate-500">
-                  {t(RARITY_LABEL_KEYS[item.rarity])}
-                </span>
-              </span>
+            <li key={item.id}>
+              <div className={tileClassName}>{tileContent}</div>
             </li>
           )
         }
@@ -132,38 +174,13 @@ export function CosmeticGrid({
 
                 onEquip(item.id)
               }}
-              className={cn(
-                'flex w-full items-center gap-3 rounded-2xl p-3 text-left transition-colors',
-                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 dark:focus-visible:outline-brand',
-                equipped
-                  ? 'bg-emerald-50 ring-2 ring-emerald-500 dark:bg-emerald-500/15 dark:ring-brand'
-                  : 'bg-white ring-1 ring-slate-200 hover:bg-slate-50 dark:bg-surface-raised dark:ring-slate-700 dark:hover:bg-slate-700',
-              )}
+              className={cn(tileClassName, 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand')}
             >
-              <ItemPreview assetRef={item.assetRef} />
-              <span className="min-w-0">
-                <span className="block text-sm font-medium text-slate-900 dark:text-primary">
-                  {cosmeticName(locale, item.id)}
-                </span>
-                <span className="mt-0.5 block text-xs text-slate-500 dark:text-muted">
-                  {t(RARITY_LABEL_KEYS[item.rarity])}
-                </span>
-                <span
-                  className={cn(
-                    'mt-0.5 flex items-center gap-1 text-xs font-medium',
-                    equipped
-                      ? 'text-emerald-700 dark:text-brand'
-                      : 'text-slate-400 dark:text-slate-500',
-                  )}
-                >
-                  {equipped && <Check className="size-3 shrink-0" />}
-                  {equipped ? t('closet.item.worn') : t('closet.item.wear')}
-                </span>
-              </span>
+              {tileContent}
             </button>
           </li>
         )
       })}
-    </ul>
+    </motion.ul>
   )
 }
