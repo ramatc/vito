@@ -1,5 +1,5 @@
-import { useMemo } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { Screen } from '../components/layout/Screen'
 import { HabitsScreen } from '../features/habits/HabitsScreen'
@@ -53,6 +53,16 @@ function HomeRoute() {
  */
 function AppShellRoute() {
   const t = useTranslate()
+  const { pathname } = useLocation()
+
+  // `AppShell` never remounts between tabs — only its `<Outlet />` content
+  // changes — and `history.pushState` (what `<NavLink>` does) leaves the
+  // window's scroll position exactly where it was, unlike a full page load.
+  // Without this, opening a long screen scrolled down and switching tabs lands
+  // on the next screen already scrolled.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
 
   const navLabels = useMemo(
     () => ({
