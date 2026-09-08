@@ -3,7 +3,7 @@ import { Check, Lock } from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import type { TranslationKey } from '../../i18n/keys'
 import { usePreferencesStore } from '../../stores/preferencesStore'
-import type { CosmeticItem } from '../../types/models'
+import type { CosmeticItem, CosmeticSlot, EquippedItems } from '../../types/models'
 import { cn } from '../../utils/cn'
 import { cosmeticName } from './cosmeticCopy'
 import { COSMETIC_PREVIEW_IMAGES } from './cosmeticPreviewImages'
@@ -75,16 +75,17 @@ function ItemPreview({ assetRef, dimmed }: { assetRef: string; dimmed: boolean }
 export interface CosmeticGridProps {
   items: readonly CosmeticItem[]
   unlockedItemIds: readonly string[]
-  /** The item worn in this slot right now, if any. */
-  equippedItemId?: string
-  onEquip(itemId: string): void
-  onUnequip(): void
+  /** What is worn across every slot — a single id is not enough once the grid
+   * can mix slots ("all items"), where a hat and a backpack are both worn at once. */
+  equippedItems: EquippedItems
+  onEquip(item: CosmeticItem): void
+  onUnequip(slot: CosmeticSlot): void
 }
 
 export function CosmeticGrid({
   items,
   unlockedItemIds,
-  equippedItemId,
+  equippedItems,
   onEquip,
   onUnequip,
 }: CosmeticGridProps) {
@@ -99,7 +100,7 @@ export function CosmeticGrid({
     >
       {items.map((item) => {
         const unlocked = unlockedItemIds.includes(item.id)
-        const equipped = item.id === equippedItemId
+        const equipped = item.id === equippedItems[item.slot]
 
         const tileClassName = cn(
           'flex min-h-[152px] w-full flex-col items-center justify-between gap-2 rounded-2xl p-3.5 text-center transition-colors',
@@ -167,12 +168,12 @@ export function CosmeticGrid({
               aria-pressed={equipped}
               onClick={() => {
                 if (equipped) {
-                  onUnequip()
+                  onUnequip(item.slot)
 
                   return
                 }
 
-                onEquip(item.id)
+                onEquip(item)
               }}
               className={cn(tileClassName, 'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand')}
             >

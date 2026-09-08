@@ -1,5 +1,4 @@
 import { useState, type ReactNode } from 'react'
-import { motion } from 'framer-motion'
 import { Screen } from '../../components/layout/Screen'
 import { COSMETIC_CATALOG } from '../../domain/vito/cosmeticCatalog'
 import { useTranslate } from '../../hooks/useTranslate'
@@ -7,10 +6,10 @@ import { useVito } from '../../hooks/useVito'
 import { useUiStore } from '../../stores/uiStore'
 import { usePreferencesStore } from '../../stores/preferencesStore'
 import { useVitoStore } from '../../stores/vitoStore'
-import type { CosmeticSlot, EquippedItems, Locale } from '../../types/models'
+import type { CosmeticItem, CosmeticSlot, EquippedItems, Locale } from '../../types/models'
 import { cosmeticName } from './cosmeticCopy'
 import { CosmeticGrid } from './CosmeticGrid'
-import { SlotPicker } from './SlotPicker'
+import { SlotPicker, type ClosetFilter } from './SlotPicker'
 
 /**
  * Vito's wardrobe.
@@ -58,49 +57,50 @@ export function ClosetScreen({ preview }: ClosetScreenProps) {
   // from an id, which `useTranslate` deliberately will not accept.
   const locale = usePreferencesStore((state) => state.preferences.locale)
   const { equippedItems, unlockedItemIds } = useVito()
-  const [slot, setSlot] = useState<CosmeticSlot>('hat')
+  const [filter, setFilter] = useState<ClosetFilter>('all')
 
-  const items = COSMETIC_CATALOG.filter((item) => item.slot === slot)
+  const items =
+    filter === 'all'
+      ? COSMETIC_CATALOG
+      : COSMETIC_CATALOG.filter((item) => item.slot === filter)
 
   const reportSaveError = () => {
     useUiStore.getState().pushToast({ message: t('common.error.save'), tone: 'info' })
   }
 
-  const equip = (itemId: string) => {
-    useVitoStore.getState().equip(slot, itemId).catch(reportSaveError)
+  const equip = (item: CosmeticItem) => {
+    useVitoStore.getState().equip(item.slot, item.id).catch(reportSaveError)
   }
 
-  const unequip = () => {
+  const unequip = (slot: CosmeticSlot) => {
     useVitoStore.getState().unequip(slot).catch(reportSaveError)
   }
 
   return (
     <Screen title={t('closet.title')} description={t('closet.description')}>
       {/*
-        `layout` on the stage and everything under it: the worn-summary
-        sentence grows from "va como él mismo" to naming three items, and
-        without this the height change would shove the picker and grid down
-        in one instant jump rather than a smooth reflow.
+        The worn-summary sentence grows from "va como él mismo" to naming
+        three items. Rather than animate that reflow, the paragraph reserves
+        two lines' worth of height up front so the picker and grid below never
+        move at all, animated or not.
       */}
-      <motion.section
-        layout
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+      <section
         aria-label={t('closet.title')}
         className="flex flex-col items-center gap-3 rounded-3xl bg-gradient-to-b from-brand/10 to-surface-raised px-6 pt-7 pb-6 ring-1 ring-brand/20"
       >
         {preview}
-        <motion.p layout className="text-center text-sm font-medium text-primary">
+        <p className="flex min-h-10 items-center text-center text-sm font-medium text-primary">
           {wornSummary(t, locale, equippedItems)}
-        </motion.p>
+        </p>
         <p className="text-center text-xs text-muted">{t('closet.worn.hint')}</p>
-      </motion.section>
+      </section>
 
-      <SlotPicker value={slot} onChange={setSlot} />
+      <SlotPicker value={filter} onChange={setFilter} />
 
       <CosmeticGrid
         items={items}
         unlockedItemIds={unlockedItemIds}
-        equippedItemId={equippedItems[slot]}
+        equippedItems={equippedItems}
         onEquip={equip}
         onUnequip={unequip}
       />

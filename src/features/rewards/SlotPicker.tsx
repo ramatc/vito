@@ -15,20 +15,24 @@ import { cn } from '../../utils/cn'
  * one is back-to-front paint order and belongs to the avatar, not to a menu.
  */
 
+/** The picker's own filter: every slot, plus "all" which is not a real `CosmeticSlot`. */
+export type ClosetFilter = CosmeticSlot | 'all'
+
 interface ClosetSlot {
-  slot: CosmeticSlot
+  slot: ClosetFilter
   labelKey: TranslationKey
 }
 
 const CLOSET_SLOTS: readonly ClosetSlot[] = [
+  { slot: 'all', labelKey: 'closet.slot.all' },
   { slot: 'hat', labelKey: 'closet.slot.hat' },
   { slot: 'backpack', labelKey: 'closet.slot.backpack' },
   { slot: 'aura', labelKey: 'closet.slot.aura' },
 ]
 
 export interface SlotPickerProps {
-  value: CosmeticSlot
-  onChange(slot: CosmeticSlot): void
+  value: ClosetFilter
+  onChange(slot: ClosetFilter): void
   className?: string
 }
 

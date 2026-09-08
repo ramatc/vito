@@ -74,6 +74,7 @@ export const EN = {
   'habits.description':
     'Everything you are building. Archived habits keep their history.',
   'habits.new': 'New',
+  'habits.section.all': 'All habits ({count})',
   'habits.empty.title': 'No habits yet',
   'habits.empty.description': 'Start with one small thing you can do today.',
   'habits.empty.action': 'Add your first habit',
@@ -156,6 +157,7 @@ export const EN = {
   'closet.worn.hint':
     'He wears it on the Today screen. Each slot is separate, so a new hat keeps everything else on.',
   'closet.slots.label': 'Cosmetic slots',
+  'closet.slot.all': 'All items',
   'closet.slot.hat': 'Hats',
   'closet.slot.backpack': 'Packs',
   'closet.slot.aura': 'Auras',

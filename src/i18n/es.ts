@@ -62,6 +62,7 @@ export const ES: Dictionary = {
   'habits.description':
     'Todo lo que estás construyendo. Los hábitos archivados conservan su historial.',
   'habits.new': 'Nuevo',
+  'habits.section.all': 'Todos los hábitos ({count})',
   'habits.empty.title': 'Todavía no hay hábitos',
   'habits.empty.description': 'Empezá con una cosa chica que puedas hacer hoy.',
   'habits.empty.action': 'Agregá tu primer hábito',
@@ -143,6 +144,7 @@ export const ES: Dictionary = {
   'closet.worn.hint':
     'Lo lleva puesto en la pantalla de Hoy. Cada espacio es independiente, así que una gorra nueva no le saca nada más.',
   'closet.slots.label': 'Espacios de accesorios',
+  'closet.slot.all': 'Todo',
   'closet.slot.hat': 'Gorras',
   'closet.slot.backpack': 'Mochilas',
   'closet.slot.aura': 'Auras',
