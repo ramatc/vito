@@ -89,3 +89,11 @@ body,
 #root {
   min-height: 100svh;
 }
+
+/* Tailwind's preflight resets buttons to `cursor: default`; every button here is
+ * clickable, so a pointer cursor is the correct affordance. */
+@layer base {
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
