@@ -104,7 +104,7 @@ export function CosmeticGrid({
 
         const tileClassName = cn(
           'flex min-h-[152px] w-full flex-col items-center justify-between gap-2 rounded-2xl p-3.5 text-center transition-colors',
-          !unlocked && 'border border-dashed border-border opacity-60',
+          !unlocked && 'border border-dashed border-border bg-surface-raised opacity-60',
           unlocked &&
             (equipped
               ? 'bg-brand/10 ring-2 ring-brand'
