@@ -28,6 +28,14 @@ const RARITY_LABEL_KEYS: Record<CosmeticItem['rarity'], TranslationKey> = {
   legendary: 'closet.rarity.legendary',
 }
 
+/** Rarity tiers get their own color, the way loot does in a game — a
+ * glance at the label should tell common from legendary before reading it. */
+const RARITY_COLOR_CLASSES: Record<CosmeticItem['rarity'], string> = {
+  common: 'text-slate-500 dark:text-slate-400',
+  rare: 'text-blue-600 dark:text-blue-400',
+  legendary: 'text-orange-600 dark:text-orange-400',
+}
+
 /**
  * One key per requirement type rather than one sentence with a slot for the
  * unit: "a 7-day streak" and "2000 XP" are not the same sentence in Spanish,
@@ -113,8 +121,10 @@ export function CosmeticGrid({
 
         const tileContent = (
           <>
-            <div className="flex w-full items-center justify-between text-[10px] font-semibold text-muted">
-              <span>{t(RARITY_LABEL_KEYS[item.rarity])}</span>
+            <div className="flex w-full items-center justify-between text-[10px] font-semibold">
+              <span className={RARITY_COLOR_CLASSES[item.rarity]}>
+                {t(RARITY_LABEL_KEYS[item.rarity])}
+              </span>
               {equipped && (
                 <span className="flex items-center gap-0.5 rounded-md bg-brand px-1.5 py-0.5 font-bold text-on-brand">
                   <Check className="size-2.5" strokeWidth={3} />
