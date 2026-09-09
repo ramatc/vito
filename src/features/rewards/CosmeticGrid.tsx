@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import { Check, Lock } from 'lucide-react'
 import { useTranslate } from '../../hooks/useTranslate'
 import type { TranslationKey } from '../../i18n/keys'
@@ -101,11 +100,7 @@ export function CosmeticGrid({
   const locale = usePreferencesStore((state) => state.preferences.locale)
 
   return (
-    <motion.ul
-      layout
-      transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="grid grid-cols-2 gap-3 sm:grid-cols-3"
-    >
+    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {items.map((item) => {
         const unlocked = unlockedItemIds.includes(item.id)
         const equipped = item.id === equippedItems[item.slot]
@@ -192,6 +187,6 @@ export function CosmeticGrid({
           </li>
         )
       })}
-    </motion.ul>
+    </ul>
   )
 }
