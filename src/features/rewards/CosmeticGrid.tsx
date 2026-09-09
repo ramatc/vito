@@ -103,7 +103,7 @@ export function CosmeticGrid({
         const equipped = item.id === equippedItems[item.slot]
 
         const tileClassName = cn(
-          'flex min-h-[152px] w-full flex-col items-center justify-between gap-2 rounded-2xl p-3.5 text-center transition-colors',
+          'flex h-full min-h-[152px] w-full flex-col items-center justify-between gap-2 rounded-2xl p-3.5 text-center transition-colors',
           !unlocked && 'border border-dashed border-border bg-surface-raised opacity-60',
           unlocked &&
             (equipped
@@ -153,14 +153,14 @@ export function CosmeticGrid({
         // screen reader user gets a label, not a dead button to puzzle over).
         if (!unlocked) {
           return (
-            <li key={item.id}>
+            <li key={item.id} className="h-full">
               <div className={tileClassName}>{tileContent}</div>
             </li>
           )
         }
 
         return (
-          <li key={item.id}>
+          <li key={item.id} className="h-full">
             <button
               type="button"
               // One control per item: tapping the worn one takes it off, so a
