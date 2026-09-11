@@ -75,6 +75,13 @@ export function daysBetween(from: DateKey, to: DateKey): number {
   return (toUtcMs(to) - toUtcMs(from)) / MS_PER_DAY
 }
 
+/** The Monday on or before `date` (JS weekday numbering has Sunday=0). */
+export function startOfWeek(date: DateKey): DateKey {
+  const mondayFirstOffset = (weekdayOf(date) + 6) % 7
+
+  return addDays(date, -mondayFirstOffset)
+}
+
 /** Every day from `from` to `to`, both endpoints included. Empty if inverted. */
 export function eachDay(from: DateKey, to: DateKey): DateKey[] {
   const days: DateKey[] = []

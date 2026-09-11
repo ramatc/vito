@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from '../components/layout/AppShell'
 import { Screen } from '../components/layout/Screen'
+import { HabitReportsScreen } from '../features/habits/HabitReportsScreen'
 import { HabitsScreen } from '../features/habits/HabitsScreen'
 import { TodayHabits } from '../features/habits/TodayHabits'
 import { ProgressSection } from '../features/progress/ProgressSection'
@@ -121,6 +122,7 @@ export function AppRoutes() {
       <Route element={<AppShellRoute />}>
         <Route index element={<HomeRoute />} />
         <Route path="habits" element={<HabitsScreen />} />
+        <Route path="habits/reports" element={<HabitReportsScreen />} />
         <Route path="closet" element={<ClosetRoute />} />
         <Route path="settings" element={<SettingsRoute />} />
         {/* An unknown URL lands on Today rather than on a dead end. */}

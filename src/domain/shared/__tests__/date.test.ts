@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { addDays, daysBetween, eachDay, todayKey, weekdayOf } from '../date'
+import { addDays, daysBetween, eachDay, startOfWeek, todayKey, weekdayOf } from '../date'
 
 afterEach(() => {
   vi.useRealTimers()
@@ -118,6 +118,20 @@ describe('eachDay', () => {
       '2026-02-01',
       '2026-02-02',
     ])
+  })
+})
+
+describe('startOfWeek', () => {
+  it('rolls a mid-week Wednesday back to that week\'s Monday', () => {
+    expect(startOfWeek('2026-03-11')).toBe('2026-03-09')
+  })
+
+  it('rolls a Sunday back 6 days to the prior Monday', () => {
+    expect(startOfWeek('2026-03-08')).toBe('2026-03-02')
+  })
+
+  it('leaves a Monday unchanged', () => {
+    expect(startOfWeek('2026-03-09')).toBe('2026-03-09')
   })
 })
 

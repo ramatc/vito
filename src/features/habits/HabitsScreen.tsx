@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import { ClipboardList, Plus } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Screen } from '../../components/layout/Screen'
 import { Button } from '../../components/ui/Button'
 import { Card } from '../../components/ui/Card'
@@ -85,14 +86,24 @@ export function HabitsScreen() {
       title={t('habits.title')}
       description={t('habits.description')}
       action={
-        <button
-          type="button"
-          aria-label={t('habits.new')}
-          onClick={openNew}
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
-        >
-          <Plus className="size-5" strokeWidth={2.5} />
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            to="/habits/reports"
+            aria-label={t('habits.reports.entry')}
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-full text-muted hover:bg-surface-sunken hover:text-primary"
+          >
+            <ClipboardList className="size-5" />
+          </Link>
+
+          <button
+            type="button"
+            aria-label={t('habits.new')}
+            onClick={openNew}
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-brand text-on-brand transition-colors hover:bg-brand-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
+          >
+            <Plus className="size-5" strokeWidth={2.5} />
+          </button>
+        </div>
       }
     >
       <div className="flex flex-col gap-2">

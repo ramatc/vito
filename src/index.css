@@ -41,6 +41,26 @@
   --warm-soft: #fef3c7;
   --warm-text: #92400e;
   --border: #e8e6e0;
+
+  /* Habit Reports' per-row palette. `sprout` and `honey` deliberately reuse
+   * the brand/warm values above rather than inventing new greens/ambers —
+   * the report should read as an extension of Brote, not a seventh accent
+   * family competing with it. */
+  --report-sprout-bg: #e3f5e9;
+  /* brand-strong rather than brand: brand alone reads under 3:1 against
+   * surface-raised in light mode, and brand-strong is the token this app
+   * already uses for exactly that reason (hover/pressed brand states). */
+  --report-sprout-fill: #059669;
+  --report-sky-bg: #e3eef8;
+  --report-sky-fill: #3b82c4;
+  --report-blossom-bg: #fbe7ec;
+  --report-blossom-fill: #d1608a;
+  --report-honey-bg: #fef3c7;
+  --report-honey-fill: #d97706;
+  --report-lilac-bg: #ede6f6;
+  --report-lilac-fill: #8b6bc7;
+  --report-clay-bg: #f7e6dd;
+  --report-clay-fill: #c06a45;
 }
 
 .dark {
@@ -58,6 +78,19 @@
   --warm-soft: #3a2c16;
   --warm-text: #f3d9a8;
   --border: #2a322c;
+
+  --report-sprout-bg: #1c2a20;
+  --report-sprout-fill: #5fc97f;
+  --report-sky-bg: #1a2530;
+  --report-sky-fill: #6ba7dd;
+  --report-blossom-bg: #2e1e26;
+  --report-blossom-fill: #e08bab;
+  --report-honey-bg: #3a2c16;
+  --report-honey-fill: #f0b15e;
+  --report-lilac-bg: #241f30;
+  --report-lilac-fill: #af95df;
+  --report-clay-bg: #2c2019;
+  --report-clay-fill: #e0916b;
 }
 
 /*
@@ -82,6 +115,19 @@
   --color-warm-soft: var(--warm-soft);
   --color-warm-text: var(--warm-text);
   --color-border: var(--border);
+
+  --color-report-sprout-bg: var(--report-sprout-bg);
+  --color-report-sprout-fill: var(--report-sprout-fill);
+  --color-report-sky-bg: var(--report-sky-bg);
+  --color-report-sky-fill: var(--report-sky-fill);
+  --color-report-blossom-bg: var(--report-blossom-bg);
+  --color-report-blossom-fill: var(--report-blossom-fill);
+  --color-report-honey-bg: var(--report-honey-bg);
+  --color-report-honey-fill: var(--report-honey-fill);
+  --color-report-lilac-bg: var(--report-lilac-bg);
+  --color-report-lilac-fill: var(--report-lilac-fill);
+  --color-report-clay-bg: var(--report-clay-bg);
+  --color-report-clay-fill: var(--report-clay-fill);
 }
 
 html,

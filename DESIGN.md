@@ -62,6 +62,25 @@ re-exposed via `@theme inline` as `--color-*` so they're usable as
 | `warm-text`    | Text on `warm-soft` background                    | `#7A4E0F` | `#F3D9A8` |
 | `border`       | Hairline borders                                 | `#E6E2D3` | `#2A322C` |
 
+### Habit Reports row palette
+
+Six additional pairs, for the weekly report's per-habit row coloring
+(`src/features/habits/habitPalette.ts` maps a habit's list index to one of
+these, wrapping after 6). `sprout` and `honey` are the existing `brand`/
+`brand-strong` and `warm` values, not new colors — the report is meant to
+read as an extension of Brote, not a seventh accent family. `-bg` is the
+row's own soft background tint; `-fill` is the saturated color of a
+completed-day cell, and targets ≥3:1 against `surface-raised` in both modes.
+
+| Token             | Role                        | Light `-bg` | Light `-fill` | Dark `-bg` | Dark `-fill` |
+| ----------------- | --------------------------- | ----------- | -------------- | ---------- | ------------- |
+| `report-sprout`   | Row 1 (reuses brand)        | `#E3F5E9`   | `#059669`      | `#1C2A20`  | `#5FC97F`     |
+| `report-sky`      | Row 2                       | `#E3EEF8`   | `#3B82C4`      | `#1A2530`  | `#6BA7DD`     |
+| `report-blossom`  | Row 3                       | `#FBE7EC`   | `#D1608A`      | `#2E1E26`  | `#E08BAB`     |
+| `report-honey`    | Row 4 (reuses warm)         | `#FEF3C7`   | `#D97706`      | `#3A2C16`  | `#F0B15E`     |
+| `report-lilac`    | Row 5                       | `#EDE6F6`   | `#8B6BC7`      | `#241F30`  | `#AF95DF`     |
+| `report-clay`     | Row 6                       | `#F7E6DD`   | `#C06A45`      | `#2C2019`  | `#E0916B`     |
+
 Two directions were dealt and dropped after a live comparison: "Sobremesa" (warm
 stone neutrals, bottle-green + terracotta) and "Recreo" (coral/tangerine brand,
 golden-amber streak). Their exact values aren't preserved here — if either is
