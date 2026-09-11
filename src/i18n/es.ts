@@ -71,10 +71,18 @@ export const ES: Dictionary = {
     '"{name}" sale de tu lista a partir de hoy. Todo lo que ya ganó queda exactamente como está.',
   'habits.archive.confirm': 'Archivar',
 
+  'habits.card.viewStats': 'Ver estadísticas de {name}',
   'habits.card.edit': 'Editar {name}',
   'habits.card.archive': 'Archivar {name}',
   'habits.card.complete': 'Completar {name}',
   'habits.card.uncheck': 'Desmarcar {name}',
+
+  'habits.stats.title': 'Estadísticas de {name}',
+  'habits.stats.summary': '{completed} de {scheduled} días agendados',
+  'habits.stats.legend.completed': 'Completado',
+  'habits.stats.legend.missed': 'Fallado',
+  'habits.stats.legend.rest': 'Día de descanso',
+  'habits.stats.legend.pending': 'Hoy',
 
   'habits.today.label': 'Hábitos de hoy',
   'habits.today.progress': '{completed} de {scheduled} hechos hoy',

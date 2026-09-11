@@ -83,10 +83,18 @@ export const EN = {
     '"{name}" moves out of your list from today on. Everything it has already earned stays exactly as it is.',
   'habits.archive.confirm': 'Archive',
 
+  'habits.card.viewStats': 'View stats for {name}',
   'habits.card.edit': 'Edit {name}',
   'habits.card.archive': 'Archive {name}',
   'habits.card.complete': 'Complete {name}',
   'habits.card.uncheck': 'Uncheck {name}',
+
+  'habits.stats.title': '{name} stats',
+  'habits.stats.summary': '{completed} of {scheduled} scheduled days',
+  'habits.stats.legend.completed': 'Completed',
+  'habits.stats.legend.missed': 'Missed',
+  'habits.stats.legend.rest': 'Rest day',
+  'habits.stats.legend.pending': 'Today',
 
   'habits.today.label': "Today's habits",
   'habits.today.progress': '{completed} of {scheduled} done today',

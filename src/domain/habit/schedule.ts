@@ -8,7 +8,7 @@ import { addDays, daysBetween, eachDay, weekdayOf } from '../shared/date'
  */
 
 /** The calendar day of an ISO timestamp, i.e. its leading `YYYY-MM-DD`. */
-function dayOf(isoTimestamp: string): DateKey {
+export function dayOf(isoTimestamp: string): DateKey {
   return isoTimestamp.slice(0, 10)
 }
 

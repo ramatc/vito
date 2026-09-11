@@ -1,6 +1,6 @@
 import { createElement, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from 'framer-motion'
-import { Archive, Check, Pencil } from 'lucide-react'
+import { Archive, CalendarDays, Check, Pencil } from 'lucide-react'
 import { Card } from '../../components/ui/Card'
 import { XP_BY_DIFFICULTY } from '../../domain/habit/xpReward'
 import type { XpGainEvent } from '../../hooks/useCompleteHabit'
@@ -30,6 +30,7 @@ export interface HabitCardProps {
   habit: Habit
   completed: boolean
   onToggle(habitId: string): void
+  onViewStats?(habit: Habit): void
   onEdit?(habit: Habit): void
   onArchive?(habit: Habit): void
   disabled?: boolean
@@ -41,6 +42,7 @@ export function HabitCard({
   habit,
   completed,
   onToggle,
+  onViewStats,
   onEdit,
   onArchive,
   disabled = false,
@@ -148,6 +150,19 @@ export function HabitCard({
           {habit.category} · {describeFrequency(locale, habit.frequency)} · {xpHint}
         </p>
       </div>
+
+      {onViewStats !== undefined && (
+        <button
+          type="button"
+          aria-label={t('habits.card.viewStats', { name: habit.name })}
+          onClick={() => {
+            onViewStats(habit)
+          }}
+          className="inline-flex size-11 items-center justify-center rounded-xl text-muted hover:bg-surface-sunken hover:text-primary"
+        >
+          <CalendarDays className="size-4" />
+        </button>
+      )}
 
       {onEdit !== undefined && (
         <button
