@@ -14,7 +14,6 @@ import type { Habit } from '../../types/models'
 import type { HabitDraftValues } from './HabitForm'
 import { HabitFormModal } from './HabitFormModal'
 import { HabitList } from './HabitList'
-import { HabitStatsModal } from './HabitStatsModal'
 
 /**
  * The habit manager: every active habit, with create, edit, archive and today's
@@ -32,7 +31,6 @@ export function HabitsScreen() {
   const [editing, setEditing] = useState<Habit | undefined>(undefined)
   const [formOpen, setFormOpen] = useState(false)
   const [archiving, setArchiving] = useState<Habit | undefined>(undefined)
-  const [viewingStats, setViewingStats] = useState<Habit | undefined>(undefined)
 
   const activeHabits = habits.filter((habit) => habit.archivedAt === undefined)
 
@@ -119,7 +117,6 @@ export function HabitsScreen() {
           onToggle={onToggle}
           busyHabitIds={pendingHabitIds}
           lastGain={lastGain}
-          onViewStats={setViewingStats}
           onEdit={openEdit}
           onArchive={setArchiving}
           empty={
@@ -142,14 +139,6 @@ export function HabitsScreen() {
         habit={editing}
         onSubmit={submitForm}
         onClose={closeForm}
-      />
-
-      <HabitStatsModal
-        open={viewingStats !== undefined}
-        habit={viewingStats}
-        onClose={() => {
-          setViewingStats(undefined)
-        }}
       />
 
       <ConfirmDialog

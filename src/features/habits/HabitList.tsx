@@ -12,7 +12,6 @@ export interface HabitListProps {
   habits: readonly Habit[]
   completedHabitIds: readonly string[]
   onToggle(habitId: string): void
-  onViewStats?(habit: Habit): void
   onEdit?(habit: Habit): void
   onArchive?(habit: Habit): void
   /** Shown instead of the list when there is nothing to render. */
@@ -26,7 +25,6 @@ export function HabitList({
   habits,
   completedHabitIds,
   onToggle,
-  onViewStats,
   onEdit,
   onArchive,
   empty,
@@ -49,7 +47,6 @@ export function HabitList({
             completed={completed.has(habit.id)}
             disabled={busy.has(habit.id)}
             onToggle={onToggle}
-            onViewStats={onViewStats}
             onEdit={onEdit}
             onArchive={onArchive}
             xpGainEvent={lastGain?.habitId === habit.id ? lastGain : undefined}
