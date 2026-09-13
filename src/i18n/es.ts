@@ -91,10 +91,10 @@ export const ES: Dictionary = {
   'habits.reports.bestDay.label': 'Mejor día',
   'habits.reports.bestDay.marker': 'El día con más completados esta semana',
   'habits.reports.stats.metPercent': 'Cumplido %',
-  'habits.reports.stats.bestDay': 'MejorDía',
+  'habits.reports.stats.bestDay': 'Mejor día',
   'habits.reports.stats.bestDay.none': '—',
-  'habits.reports.stats.totalDone': 'TotalHecho',
-  'habits.reports.stats.bestStreak': 'MejorRacha',
+  'habits.reports.stats.totalDone': 'Total hecho',
+  'habits.reports.stats.bestStreak': 'Mejor racha',
 
   'habits.today.label': 'Hábitos de hoy',
   'habits.today.progress': '{completed} de {scheduled} hechos hoy',

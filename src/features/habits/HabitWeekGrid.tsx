@@ -25,9 +25,12 @@ export interface HabitWeekGridProps {
   locale: Locale
 }
 
-/** Leading name column, then 7 equal day columns. */
-const GRID_COLUMNS =
-  'grid grid-cols-[minmax(0,1.5fr)_repeat(7,minmax(0,1fr))] items-center gap-1'
+/**
+ * Leading name column takes all leftover space; the 7 day columns size to
+ * their fixed-size status circles (`auto`) instead of competing with the name
+ * for a fractional share — otherwise long habit names get clipped hard.
+ */
+const GRID_COLUMNS = 'grid grid-cols-[minmax(0,1fr)_repeat(7,auto)] items-center gap-1'
 
 const CELL_LABEL_KEYS: Record<HabitDayStatus, TranslationKey> = {
   completed: 'habits.reports.cell.completed',
